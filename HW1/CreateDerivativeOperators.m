@@ -1,7 +1,7 @@
 %
 % [Gx, Gy] = gradient(X);
-% (Dx*X(:))'
-% (Dy*X(:))'
+% Gx = reshape(Dx*X(:), size(X))
+% Gy = reshape(Dy*X(:), size(X))
 
 function [Dx, Dy] = CreateDerivativeOperators(X_rows, X_cols)
 
