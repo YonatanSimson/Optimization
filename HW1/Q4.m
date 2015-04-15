@@ -24,7 +24,7 @@ subplot(122);
 imagesc(Grad2); axis image; colormap gray
 title('$ ||\nabla X2||_2 $','interpreter','latex')
 
-figure(1);
+figure(3);
 subplot(121);
 imagesc(X3); axis image; colormap gray
 title('X3')
