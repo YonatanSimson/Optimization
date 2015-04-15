@@ -18,4 +18,5 @@ elseif (dim == 2)%Dx
 else
     error('Illegal value for ''dim''');
 end
+
     
