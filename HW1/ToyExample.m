@@ -54,6 +54,7 @@ A(8, :) = calcEmitterToReceiverWeights(startXY, direction, BoundingBox, A_cols, 
 [Dx, Dy] = CreateDerivativeOperators(X_rows, X_cols);
 
 %% LS solution
+A= sparse(A);
 lambda = 1;
 
 L = [Dx; Dy];
