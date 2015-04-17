@@ -59,10 +59,10 @@ lambda = 1;
 L = [Dx; Dy];
 AA = [A; sqrt(lambda)*L];
 
-B = [Y; zeros(size(L, 1), 1)];
+B = [y; zeros(size(L, 1), 1)];
 
-Xest = pinv(AA)*B;
+Xest = inv(A'*A + lambda*L'*L)*A'*y;
 Xest = reshape(Xest, [X_rows, X_cols]);
 
 Xest = 255*exp(-Xest);%Io = 255
-figure; imagesc(Xest); colormap gray; axis image
+figure; imagesc(uint8(Xest)); colormap gray; axis image
