@@ -1,6 +1,6 @@
 load('Y')
 [i,j,s] = find(Y);
-Y = s;
+y = s;
 
 %% Calc A matrix
 BoundingBox = [1;5;1;5];%[start_x, end_x, start_y, end_y];
@@ -15,11 +15,10 @@ startXY = [2, 5];
 direction = -3*pi/4;%up, left
 A(1, :) = calcEmitterToReceiverWeights(startXY, direction, BoundingBox, A_cols, X_rows, X_cols);
 
-
 %second row (2,2)
 startXY = [1, 2];
 direction = pi/4;%down, right
-A(3, :) = calcEmitterToReceiverWeights(startXY, direction, BoundingBox, A_cols, X_rows, X_cols);
+A(2, :) = calcEmitterToReceiverWeights(startXY, direction, BoundingBox, A_cols, X_rows, X_cols);
 
 %Third row (6, 2)
 startXY = [4, 1];
@@ -46,7 +45,6 @@ startXY = [1, 1];
 direction = 0;%right
 A(7, :) = calcEmitterToReceiverWeights(startXY, direction, BoundingBox, A_cols, X_rows, X_cols);
 
-
 %8th row (4, 5)
 startXY = [1, 5];
 direction = -pi/4;%up, right
@@ -66,4 +64,5 @@ B = [Y; zeros(size(L, 1), 1)];
 Xest = pinv(AA)*B;
 Xest = reshape(Xest, [X_rows, X_cols]);
 
+Xest = 255*exp(-Xest);%Io = 255
 figure; imagesc(Xest); colormap gray; axis image
