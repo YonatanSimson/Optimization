@@ -86,7 +86,7 @@ end
 figure(2); plot(1:numOfIter, cost); xlabel('n iteration'); ylabel('cost')
 x_gs = reshape(x, [X_rows, X_cols]);
 
-residual = sum(sum((x_gs - Xest).^2));
+residual_gs = sum(sum((x_gs - Xest).^2));
  
  %  Run fminunc to obtain the optimal x
 %  Set options for fminunc
@@ -94,9 +94,11 @@ options = optimset('GradObj', 'on', 'MaxIter', 400);
 x_0 = 0.5*ones(5*5, 1);
 [x_min, cost] = ...
 	fminunc(@(t)(costFunction(t, A, L, y, lambda)), x_0, options);
-
 x_min = reshape(x_min, [X_rows, X_cols]);
+
+residual_min = sum(sum((x_min - Xest).^2));
 
 %Solution using lsqr
 x_ls = lsqr(AA, B, 1e-6, 200);
 x_ls = reshape(x_ls, [X_rows, X_cols]);
+residual_ls = sum(sum((x_ls - Xest).^2));
