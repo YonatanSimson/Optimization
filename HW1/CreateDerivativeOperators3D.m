@@ -43,8 +43,8 @@ for m = 1:size2d,
     idx = idx + 1;
 end
 
-for n = 2:size2d-1,
-    for m = 1:X_dim,
+for n = 2:X_dim-1,
+    for m = 1:size2d,
         ii(2*idx-1) = idx;
         jj(2*idx-1) = idx - size2d;
         v(2*idx-1)  = -0.5;
