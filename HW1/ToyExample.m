@@ -92,12 +92,11 @@ residual = sum(sum((x_gs - Xest).^2));
 %  Set options for fminunc
 options = optimset('GradObj', 'on', 'MaxIter', 400);
 x_0 = 0.5*ones(5*5, 1);
-[x_opt, cost] = ...
+[x_min, cost] = ...
 	fminunc(@(t)(costFunction(t, A, L, y, lambda)), x_0, options);
 
-x_opt = reshape(x_opt, [X_rows, X_cols]);
+x_min = reshape(x_min, [X_rows, X_cols]);
 
-Q = (A'*A) + lambda*(L'*L);
-b = 2*A'*y;
-x_tag = lsqr(Q, b);
-x_tag = reshape(x_tag, [X_rows, X_cols]);
+%Solution using lsqr
+x_ls = lsqr(AA, B, 1e-6, 200);
+x_ls = reshape(x_ls, [X_rows, X_cols]);
