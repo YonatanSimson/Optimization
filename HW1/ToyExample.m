@@ -55,7 +55,7 @@ A(8, :) = calcEmitterToReceiverWeights(startXY, direction, BoundingBox, A_cols, 
 
 %% LS solution
 A= sparse(A);
-lambda = 1;
+lambda = 1e-5;
 
 L = [Dx; Dy];
 AA = [A; sqrt(lambda)*L];
@@ -65,5 +65,21 @@ B = [y; zeros(size(L, 1), 1)];
 Xest = inv(A'*A + lambda*L'*L)*A'*y;
 Xest = reshape(Xest, [X_rows, X_cols]);
 
-Xest = 255*exp(-Xest);%Io = 255
-figure; imagesc(uint8(Xest)); colormap gray; axis image
+I = 255*exp(-Xest);%Io = 255
+figure; imagesc(uint8(I)); colormap gray; axis image
+
+%% Solve the same problem iterativley
+%  Set options for fminunc
+options = optimset('GradObj', 'on', 'MaxIter', 400);
+[J, grad] = costFunction(Xest(:), A, L, y, lambda);
+%  Run fminunc to obtain the optimal x
+x_0 = 0.5*ones(5*5, 1);
+[x_opt, cost] = ...
+	fminunc(@(t)(costFunction(t, A, L, y, lambda)), x_0, options);
+
+x_opt = reshape(x_opt, [X_rows, X_cols]);
+
+Q = (A'*A) + lambda*(L'*L);
+b = 2*A'*y;
+x_tag = lsqr(Q, b);
+x_tag = reshape(x_tag, [X_rows, X_cols]);
