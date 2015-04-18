@@ -66,13 +66,31 @@ Xest = inv(A'*A + lambda*L'*L)*A'*y;
 Xest = reshape(Xest, [X_rows, X_cols]);
 
 I = 255*exp(-Xest);%Io = 255
-figure; imagesc(uint8(I)); colormap gray; axis image
+figure(1); imagesc(uint8(I)); colormap gray; axis image
 
-%% Solve the same problem iterativley
+%% Solve the same problem iteratively
+[J, grad] = costFunction(Xest(:), A, L, y, lambda);
+checkGradients(A, L, y, lambda);%numerical check of gradient
+
+%my iterative solution using steepest descent
+numOfIter = 400;
+cost = zeros(1, numOfIter);
+alpha = 0.05;
+x_0 = 0.5*ones(5*5, 1);
+x = x_0;
+for k = 1:numOfIter,
+    [cost(k), grad] = costFunction(x, A, L, y, lambda);
+    x = x - alpha*grad;
+end
+
+figure(2); plot(1:numOfIter, cost); xlabel('n iteration'); ylabel('cost')
+x_gs = reshape(x, [X_rows, X_cols]);
+
+residual = sum(sum((x_gs - Xest).^2));
+ 
+ %  Run fminunc to obtain the optimal x
 %  Set options for fminunc
 options = optimset('GradObj', 'on', 'MaxIter', 400);
-[J, grad] = costFunction(Xest(:), A, L, y, lambda);
-%  Run fminunc to obtain the optimal x
 x_0 = 0.5*ones(5*5, 1);
 [x_opt, cost] = ...
 	fminunc(@(t)(costFunction(t, A, L, y, lambda)), x_0, options);
