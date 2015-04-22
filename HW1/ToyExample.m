@@ -68,9 +68,30 @@ Xest = reshape(Xest, [X_rows, X_cols]);
 I = 255*exp(-Xest);%Io = 255
 figure(1); imagesc(uint8(I)); colormap gray; axis image
 
+%% Amit's solutions
+tmp = ((A')*A+lambda*(L')*L)\(A');%inv((A')*A+l*(L')*L) *(A');
+x_a = tmp*y;
+
+b_lsqr=(A') *  y;
+A_lsqr=((A')*A+lambda*(L')*L);
+x_lsqr=lsqr(A_lsqr,b_lsqr,1e-16,100);%seems that max iteration num is 25 -> limitted to the size of x
+
+x_pcg = pcg(A_lsqr,b_lsqr,1e-16,100);
+ 
+%Notes:
+norm([x_a-x_lsqr])
+norm([x_a-x_pcg])
+
 %% Solve the same problem iteratively
 [J, grad] = costFunction(Xest(:), A, L, y, lambda);
-checkGradients(A, L, y, lambda);%numerical check of gradient
+% Check gradient
+costFunc = @(x) costFunction(x, A, L, y, lambda);
+x_0 = 0.5*ones(size(A, 2), 1);
+
+[~, grad] = costFunc(x_0);
+numgrad = computeNumericalGradient(costFunc, x_0);
+diffGrad = norm(numgrad-grad)/norm(numgrad+grad);
+disp(['difference between pre-calculated and numerical gradient is: ' num2str(max(diffGrad))])
 
 %my iterative solution using steepest descent
 numOfIter = 400;
@@ -90,7 +111,7 @@ residual_gs = sum(sum((x_gs - Xest).^2));
  
  %  Run fminunc to obtain the optimal x
 %  Set options for fminunc
-options = optimset('GradObj', 'on', 'MaxIter', 400);
+options = optimset('GradObj', 'on', 'MaxIter', 200);
 x_0 = 0.5*ones(5*5, 1);
 [x_min, cost] = ...
 	fminunc(@(t)(costFunction(t, A, L, y, lambda)), x_0, options);
