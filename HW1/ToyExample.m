@@ -86,7 +86,7 @@ norm([x_a-x_pcg])
 [J, grad] = costFunction(Xest(:), A, L, y, lambda);
 % Check gradient
 costFunc = @(x) costFunction(x, A, L, y, lambda);
-x_0 = 0.5*ones(size(A, 2), 1);
+x_0 = 0.5*zeros(size(A, 2), 1);
 
 [~, grad] = costFunc(x_0);
 numgrad = computeNumericalGradient(costFunc, x_0);
@@ -94,14 +94,18 @@ diffGrad = norm(numgrad-grad)/norm(numgrad+grad);
 disp(['difference between pre-calculated and numerical gradient is: ' num2str(max(diffGrad))])
 
 %my iterative solution using steepest descent
-numOfIter = 400;
+numOfIter = 200;
 cost = zeros(1, numOfIter);
-alpha = 0.05;
+alpha = 0.01;
+alphaMax = 0.1;
 x_0 = 0.5*ones(5*5, 1);
 x = x_0;
 for k = 1:numOfIter,
     [cost(k), grad] = costFunction(x, A, L, y, lambda);
-    x = x - alpha*grad;
+    %line search for alpha_k
+    %minimize f(x_k + a_k*d_k) as a function of a_k
+    alpha_k = BisectionLineSearch(func, 0, alphaMax, x, -grad, 100, 1e-6);
+    x = x - alpha_k*grad;
 end
 
 figure(2); plot(1:numOfIter, cost); xlabel('n iteration'); ylabel('cost')
@@ -112,12 +116,12 @@ residual_gs = sum(sum((x_gs - Xest).^2));
  %  Run fminunc to obtain the optimal x
 %  Set options for fminunc
 options = optimset('GradObj', 'on', 'MaxIter', 200);
-x_0 = 0.5*ones(5*5, 1);
+x_0 = ones(5*5, 1);
 [x_min, cost] = ...
 	fminunc(@(t)(costFunction(t, A, L, y, lambda)), x_0, options);
 x_min = reshape(x_min, [X_rows, X_cols]);
 
-residual_min = sum(sum((x_min - Xest).^2));
+residual_min = sum(sum((x_min - Xest).^2))
 
 %Solution using lsqr
 x_ls = lsqr(AA, B, 1e-6, 200);
