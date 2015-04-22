@@ -14,7 +14,7 @@ L = [Dx; Dy; Dz];
 AA = [A; sqrt(lambda)*L];
 B = [y; zeros(size(L, 1), 1)];
 %Solution using lsqr
-x_ls = lsqr(AA, B, 1e-10, 1000);
+x_ls = lsqr(AA, B, 1e-10, 5000);
 x_ls = reshape(x_ls, [rows, cols, dim]);
 %solution using inverse - takes a while
 Xest = ((A'*A) + lambda*(L'*L))\(A'*y);
@@ -40,12 +40,11 @@ L = [Dx; Dy; Dz];
 AA = [A; sqrt(lambda)*L];
 B = [y; zeros(size(L, 1), 1)];
 %Solution using lsqr
-x_ls = lsqr(AA, B, 1e-6, 400);
+x_ls = lsqr(AA, B, 1e-10, 5000);
 x_ls = reshape(x_ls, [rows, cols, dim]);
-%solution using inverse - takes a while
-Xest = ((A'*A) + lambda*(L'*L))\(A'*y);%does not work for the large solution
 
-residual_ls = sum(sum((x_ls(:) - Xest(:)).^2));
+X = reshape(x_ls, [rows, cols, dim]);
+displayVolumeSliceGUI(X);
 
 X = reshape(x_ls, [rows, cols, dim]);
 displayVolumeSliceGUI(X);
