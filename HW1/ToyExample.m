@@ -62,11 +62,18 @@ AA = [A; sqrt(lambda)*L];
 
 B = [y; zeros(size(L, 1), 1)];
 
-Xest = inv(A'*A + lambda*L'*L)*A'*y;
+Xest = (A'*A + lambda*L'*L)\(A'*y);
 Xest = reshape(Xest, [X_rows, X_cols]);
 
 I = 255*exp(-Xest);%Io = 255
 figure(1); imagesc(uint8(I)); colormap gray; axis image
+
+%Solution using lsqr
+M1 = chol(AA'*AA);
+x_ls = lsqr(AA, B, 1e-6, 200, M1, M1');
+x_ls = reshape(x_ls, [X_rows, X_cols]);
+residual_ls = sum(sum((x_ls - Xest).^2));
+
 
 %% Amit's solutions
 tmp = ((A')*A+lambda*(L')*L)\(A');%inv((A')*A+l*(L')*L) *(A');
@@ -74,9 +81,10 @@ x_a = tmp*y;
 
 b_lsqr=(A') *  y;
 A_lsqr=((A')*A+lambda*(L')*L);
-x_lsqr=lsqr(A_lsqr,b_lsqr,1e-16,100);%seems that max iteration num is 25 -> limitted to the size of x
+x_lsqr=lsqr(A_lsqr,b_lsqr,1e-10,500);%seems that max iteration num is 25 -> limitted to the size of x
 
-x_pcg = pcg(A_lsqr,b_lsqr,1e-16,100);
+M1 = chol(A_lsqr);
+x_pcg = pcg(A_lsqr,b_lsqr,1e-10,500, M1, M1');
  
 %Notes:
 norm([x_a-x_lsqr])
@@ -98,7 +106,8 @@ numOfIter = 200;
 cost = zeros(1, numOfIter);
 alpha = 0.01;
 alphaMax = 0.1;
-x_0 = 0.5*ones(5*5, 1);
+rng(123);
+x_0 = 0.5*rand(5*5, 1);
 x = x_0;
 for k = 1:numOfIter,
     [cost(k), grad] = costFunction(x, A, L, y, lambda);
@@ -112,7 +121,12 @@ figure(2); plot(1:numOfIter, cost); xlabel('n iteration'); ylabel('cost')
 x_gs = reshape(x, [X_rows, X_cols]);
 
 residual_gs = sum(sum((x_gs - Xest).^2));
- 
+
+[x, cost] = GradientDescent(AA, B, x_0, 10000, 1e-6);
+figure(3); plot(1:numOfIter, cost); xlabel('n iteration'); ylabel('cost')
+x_gs2 = reshape(x, [X_rows, X_cols]);
+residual_gs2 = sum(sum((x_gs2 - Xest).^2));
+
  %  Run fminunc to obtain the optimal x
 %  Set options for fminunc
 options = optimset('GradObj', 'on', 'MaxIter', 200);
@@ -123,7 +137,4 @@ x_min = reshape(x_min, [X_rows, X_cols]);
 
 residual_min = sum(sum((x_min - Xest).^2))
 
-%Solution using lsqr
-x_ls = lsqr(AA, B, 1e-6, 200);
-x_ls = reshape(x_ls, [X_rows, X_cols]);
-residual_ls = sum(sum((x_ls - Xest).^2));
+
