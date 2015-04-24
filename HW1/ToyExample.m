@@ -69,8 +69,7 @@ I = 255*exp(-Xest);%Io = 255
 figure(1); imagesc(uint8(I)); colormap gray; axis image
 
 %Solution using lsqr
-M1 = chol(AA'*AA);
-x_ls = lsqr(AA, B, 1e-6, 200, M1, M1');
+x_ls = lsqr(AA, B, 1e-10, 200);
 x_ls = reshape(x_ls, [X_rows, X_cols]);
 residual_ls = sum(sum((x_ls - Xest).^2));
 
@@ -102,28 +101,32 @@ diffGrad = norm(numgrad-grad)/norm(numgrad+grad);
 disp(['difference between pre-calculated and numerical gradient is: ' num2str(max(diffGrad))])
 
 %my iterative solution using steepest descent
-numOfIter = 200;
+numOfIter = 5000;
 cost = zeros(1, numOfIter);
-alpha = 0.01;
+alpha = 0.001;
 alphaMax = 0.1;
 rng(123);
 x_0 = 0.5*rand(5*5, 1);
 x = x_0;
 for k = 1:numOfIter,
     [cost(k), grad] = costFunction(x, A, L, y, lambda);
+    if (norm(grad) < 1e-6)
+        cost = cost(1:k);
+        break;
+    end
     %line search for alpha_k
     %minimize f(x_k + a_k*d_k) as a function of a_k
-    alpha_k = BisectionLineSearch(func, 0, alphaMax, x, -grad, 100, 1e-6);
+    alpha_k = BisectionLineSearch(costFunc, 0, alphaMax, x, -grad, 200, 1e-8);
     x = x - alpha_k*grad;
 end
 
-figure(2); plot(1:numOfIter, cost); xlabel('n iteration'); ylabel('cost')
+figure(2); plot(1:length(cost), cost); xlabel('n iteration'); ylabel('cost')
 x_gs = reshape(x, [X_rows, X_cols]);
 
 residual_gs = sum(sum((x_gs - Xest).^2));
 
 [x, cost] = GradientDescent(AA, B, x_0, 10000, 1e-6);
-figure(3); plot(1:numOfIter, cost); xlabel('n iteration'); ylabel('cost')
+figure(3); plot(1:length(cost), cost); xlabel('n iteration'); ylabel('cost')
 x_gs2 = reshape(x, [X_rows, X_cols]);
 residual_gs2 = sum(sum((x_gs2 - Xest).^2));
 

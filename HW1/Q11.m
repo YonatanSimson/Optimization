@@ -8,7 +8,7 @@ cols = 19;
 dim  = 19;
 [Dx, Dy, Dz] = CreateDerivativeOperators3D(rows, cols, dim);
 
-lambda = 1e-5;
+lambda = 1e-3;
 
 L = [Dx; Dy; Dz];
 AA = [A; sqrt(lambda)*L];
