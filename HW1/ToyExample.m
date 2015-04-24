@@ -80,14 +80,15 @@ x_a = tmp*y;
 
 b_lsqr=(A') *  y;
 A_lsqr=((A')*A+lambda*(L')*L);
-x_lsqr=lsqr(A_lsqr,b_lsqr,1e-10,500);%seems that max iteration num is 25 -> limitted to the size of x
+R = chol(A_lsqr);%A_lsqr=R'*R; Cholesky
+x_lsqr=lsqr(A_lsqr,b_lsqr,1e-10,500,R',R);%seems that max iteration num is 25 -> limitted to the size of x
 
-M1 = chol(A_lsqr);
-x_pcg = pcg(A_lsqr,b_lsqr,1e-10,500, M1, M1');
+x_pcg = pcg(A_lsqr,b_lsqr,1e-10,500,R',R);
  
 %Notes:
 norm([x_a-x_lsqr])
 norm([x_a-x_pcg])
+norm([x_a-x_ls(:)])
 
 %% Solve the same problem iteratively
 [J, grad] = costFunction(Xest(:), A, L, y, lambda);
