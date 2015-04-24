@@ -86,9 +86,9 @@ x_lsqr=lsqr(A_lsqr,b_lsqr,1e-10,500,R',R);%seems that max iteration num is 25 ->
 x_pcg = pcg(A_lsqr,b_lsqr,1e-10,500,R',R);
  
 %Notes:
-norm([x_a-x_lsqr])
-norm([x_a-x_pcg])
-norm([x_a-x_ls(:)])
+norm(x_a-x_lsqr)
+norm(x_a-x_pcg)
+norm(x_a-x_ls(:))
 
 %% Solve the same problem iteratively
 [J, grad] = costFunction(Xest(:), A, L, y, lambda);
@@ -111,20 +111,21 @@ x_0 = 0.5*rand(5*5, 1);
 x = x_0;
 for k = 1:numOfIter,
     [cost(k), grad] = costFunction(x, A, L, y, lambda);
-    if (norm(grad) < 1e-6)
+    if (norm(grad) < 1e-12)
         cost = cost(1:k);
         break;
     end
     %line search for alpha_k
     %minimize f(x_k + a_k*d_k) as a function of a_k
-    alpha_k = BisectionLineSearch(costFunc, 0, alphaMax, x, -grad, 200, 1e-8);
+%     alpha_k = BisectionLineSearch(costFunc, 0, alphaMax, x, -grad, 200, 1e-8);
+    alpha_k = GoldenSectionLineSearch(@(alpha)costFunc(x-alpha*grad), 0, alpha_k, 200, 1e-8);
     x = x - alpha_k*grad;
 end
 
 figure(2); plot(1:length(cost), cost); xlabel('n iteration'); ylabel('cost')
 x_gs = reshape(x, [X_rows, X_cols]);
 
-residual_gs = sum(sum((x_gs - Xest).^2));
+residual_gs = norm(x_ls(:)-x_gs(:));
 
 [x, cost] = GradientDescent(AA, B, x_0, 10000, 1e-6);
 figure(3); plot(1:length(cost), cost); xlabel('n iteration'); ylabel('cost')
