@@ -25,10 +25,18 @@ epsilon = 0.00001;
 lambda = 1;
 maxIter = 300;
 alpha = 0.01;
+tol   = 1e-10;
 x = x_0;
 W = speye(m);
 for k = 1:maxIter,
-    x = x - alpha*(A'*(A*x - y) + lambda*L'*W*(L*x));
+    e = (A*x - y);
+    cost(k) = 0.5*(e'*e) + lambda*sum(abs(L*x));
+    grad    = (A'*e + lambda*L'*W*(L*x));
+    if (norm(grad) < tol)
+        cost = cost(1:k);
+        break;
+    end
+    x = x - alpha*grad;
     gamma = L*x;
     gamma(abs(gamma)<epsilon) = epsilon;
     W = sparse(1:m,1:m,abs(1./gamma));
