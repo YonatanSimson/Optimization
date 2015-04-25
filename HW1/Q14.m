@@ -29,8 +29,9 @@ x = x_0;
 W = speye(m);
 for k = 1:maxIter,
     x = x - alpha*(A'*(A*x - y) + lambda*L'*W*(L*x));
-    gamma = max(L*x, epsilon);
-    W = sparse(1:m,1:m,max(L*x, epsilon));
+    gamma = L*x;
+    gamma(abs(gamma)<epsilon) = epsilon;
+    W = sparse(1:m,1:m,abs(1./gamma));
 end
 
 figure; plot(t, x, t, f1); xlabel('t'); ylabel('f(t)'); 
