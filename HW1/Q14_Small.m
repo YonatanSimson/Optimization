@@ -1,4 +1,4 @@
-%Toy IRLS
+%Solving small problem. Includes IRLS
 clear; close all;
 load('Small\A');
 load('Small\y');
@@ -12,10 +12,10 @@ lambda = 1e-3;
 
 
 L = [Dx; Dy; Dz];
-AA = [A; sqrt(lambda)*L];
-B = [y; zeros(size(L, 1), 1)];
 
 %Solution using lsqr
+AA = [A; sqrt(lambda)*L];
+B = [y; zeros(size(L, 1), 1)];
 x_ls = lsqr(AA, B, 1e-12, 5000);
 x_ls = reshape(x_ls, [rows, cols, dim]);
 
@@ -23,8 +23,15 @@ x_ls = reshape(x_ls, [rows, cols, dim]);
 Xest = ((A'*A) + lambda*(L'*L))\(A'*y);
 residual_ls = sum(sum((x_ls(:) - Xest(:)).^2));
 
+%Solution using CG - as learned in class
+x0 = 0.5*rand(rows*cols*dim, 1);
+x_cg = Solve_CG(x0,y,A,lambda,L,1e-13,5000);
+disp('Amit''s CG solver accuracy for small problem:')
+norm(Xest(:)-x_cg)
+
+
 %% IRLS on previous solution
-lambda = 1;
+lambda = 1;%as required in the question
 epsilon = 0.0001;%for reweighting matrix
 maxIter = 5000;
 tol     = 1e-10;
