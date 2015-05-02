@@ -73,6 +73,11 @@ x_ls = lsqr(AA, B, 1e-10, 200);
 x_ls = reshape(x_ls, [X_rows, X_cols]);
 residual_ls = sum(sum((x_ls - Xest).^2));
 
+%% Solution using CG
+x0 = 0.5*rand(5*5, 1);
+x_cg = Solve_CG(x0,y,A,lambda,L,1e-13,100);
+disp('Amit''s CG solver accuracy:')
+norm(Xest(:)-x_cg)
 
 %% Amit's solutions
 tmp = ((A')*A+lambda*(L')*L)\(A');%inv((A')*A+l*(L')*L) *(A');
