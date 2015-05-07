@@ -38,4 +38,19 @@ tol     = 1e-10;
 [x, cost] = IRLS(A, L, y, x_ls(:), epsilon, lambda, maxIter, tol);
 figure(1); plot(1:length(cost), cost); xlabel('iter'); title('Cost')
 X = reshape(x, [rows, cols, dim]);
+
+%% display results
+figure(1)
 displayVolumeSliceGUI(X);
+
+[xx, yy, zz] = meshgrid(1:19, 1:19, 1:19);
+
+figure(2);
+p = patch(isosurface(xx,yy,zz,X,0.5));
+isonormals(xx,yy,zz,X,p)
+set(p,'FaceColor','r')
+set(p,'EdgeColor','r')
+daspect([1,1,1])
+view(3); axis tight
+camlight 
+lighting gouraud
