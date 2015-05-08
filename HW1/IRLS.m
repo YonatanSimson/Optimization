@@ -2,6 +2,7 @@
 
 function [x, cost] = IRLS(A, L, y, epsilon, lambda, maxIter, tol)
 m = size(L, 1);
+n = size(L, 1);
 
 W = speye(m);
 cost = zeros(3, maxIter);
@@ -9,9 +10,14 @@ cost = zeros(3, maxIter);
 maxIterIRLS = 10;
 %Solution using lsqr
 B = [y; zeros(size(L, 1), 1)];
+x = 0.5*rand(n, 1);
+
 for k = 1:maxIterIRLS,
     AA = [A; sqrt(lambda)*sqrt(W)*L];
-    x = lsqr(AA, B, tol, maxIter);%replace with CG
+%     x_tilde = lsqr(AA, B, tol, maxIter);%replace with CG
+    x = CG_LS1(x,AA,B,tol,maxIter);
+%     disp('CG solver accuracy for small problem:')
+%     norm(x_tilde-x)
 
     cost(1,k) = f(x);
     cost(2,k) = norm(AA*x - B);
