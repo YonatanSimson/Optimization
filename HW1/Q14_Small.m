@@ -23,10 +23,10 @@ residual_ls = sum(sum((x_ls(:) - Xest(:)).^2));
 
 %Solution using CG - as learned in class
 x0 = 0.5*rand(rows*cols*dim, 1);
-tol     = 1e-13;
-MaxIt   = 50;
-x_cg = CG_LS(x0,AA,B,tol,MaxIt);%Solve_CG(x0,y,A,lambda,L,1e-13,5000);
-disp('Amit''s CG solver accuracy for small problem:')
+tol     = 1e-8;
+MaxIt   = 5000;
+x_cg = CG_LS1(x0,AA,B,tol,MaxIt);%Solve_CG(x0,y,A,lambda,L,1e-13,5000);
+disp('CG solver accuracy for small problem:')
 norm(Xest(:)-x_cg)
 
 
