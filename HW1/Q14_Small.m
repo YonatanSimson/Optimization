@@ -9,8 +9,6 @@ dim  = 19;
 [Dx, Dy, Dz] = CreateDerivativeOperators3D(rows, cols, dim);
 
 lambda = 1e-3;
-
-
 L = [Dx; Dy; Dz];
 
 %Solution using lsqr
@@ -32,10 +30,10 @@ norm(Xest(:)-x_cg)
 
 %% IRLS on previous solution
 lambda = 1;%as required in the question
-epsilon = 0.0001;%for reweighting matrix
+epsilon = 1e-5;%for reweighting matrix
 maxIter = 5000;
 tol     = 1e-10;
-[x, cost] = IRLS(A, L, y, x_ls(:), epsilon, lambda, maxIter, tol);
+[x, cost] = IRLS(A, L, y, epsilon, lambda, maxIter, tol);
 figure(1); plot(1:length(cost), cost); xlabel('iter'); title('Cost')
 X = reshape(x, [rows, cols, dim]);
 
