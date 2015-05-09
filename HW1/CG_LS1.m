@@ -1,11 +1,12 @@
 function [x, cost]=CG_LS1(x0, A, b, tol,MaxIt)
 %CG_LS - x_min = argmin 0.5*x'*Q*x + b'*x
-% x_min=cg_ls(zeros(25,1),A,y, 1e-13,59);
+% x_min=cg_ls1(zeros(25,1),A,y, 1e-13,59);
 %
 x=x0;
 
-%When minimizing 0.5x'Qx +b'x ,as in CG lecture, pg4 section3, this is why there is factor 2 on Q:
-g =  2*(A')*( (A*x) - b); 
+%minimizing 0.5x'A'Ax-b'x ,as in CG lecture, pg4 section3:
+s=A*x-b;
+g =  (A')*s; %(A')*( A*x - b); 
 
 d=-g;
 
@@ -21,7 +22,8 @@ for k = 1:MaxIt,
     x_new = x + alpha*d;
         
     %3
-    g_new = (A')*(A*x_new -  b);
+    s1= s+alpha*r;     %s1= A*x1-y =  s+alpha*A*d = s+alpha*r
+    g_new = (A')*s1;   %(A')*(A*x_new -  b);
     
     %4
     beta = g_new'*g_new/(g'*g);
@@ -36,6 +38,7 @@ for k = 1:MaxIt,
     
     g = g_new;
     x = x_new;
+    s=s1;
     
 end
 

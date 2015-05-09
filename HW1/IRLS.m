@@ -1,23 +1,21 @@
 %IRLS
 
-function [x, cost] = IRLS(A, L, y, epsilon, lambda, maxIter, tol)
+function [x, cost] = IRLS(A, L, y, epsilon, alpha, maxIter, tol)
 m = size(L, 1);
-n = size(L, 1);
+n = size(L, 2);
 
 W = speye(m);
 cost = zeros(3, maxIter);
 
 maxIterIRLS = 10;
-%Solution using lsqr
 B = [y; zeros(size(L, 1), 1)];
+rng(123);
 x = 0.5*rand(n, 1);
 
 for k = 1:maxIterIRLS,
-    AA = [A; sqrt(lambda)*sqrt(W)*L];
+    AA = [A; sqrt(alpha)*sqrt(W)*L];
 %     x_tilde = lsqr(AA, B, tol, maxIter);%replace with CG
     x = CG_LS1(x,AA,B,tol,maxIter);
-%     disp('CG solver accuracy for small problem:')
-%     norm(x_tilde-x)
 
     cost(1,k) = f(x);
     cost(2,k) = norm(AA*x - B);
@@ -35,7 +33,7 @@ end
 %% Nested function - for cost evaluation
     function val = f(x)
         e = (AA*x - B);
-        val = 0.5*(e'*e) + lambda*sum(abs(L*x));
+        val = 0.5*(e'*e) + alpha*sum(abs(L*x));
     end
 
 end
