@@ -3,48 +3,38 @@ clear; close all;
 load('Small\A');
 load('Small\y');
 
+tol     = 1e-10;
+maxIter = 5000;
+
 rows = 19;
 cols = 19;
 dim  = 19;
 [Dx, Dy, Dz] = CreateDerivativeOperators3D(rows, cols, dim);
 
-lambda = 1e-3;
 
 L = [Dx; Dy; Dz];
-AA = [A; sqrt(lambda)*L];
 B = [y; zeros(size(L, 1), 1)];
-%Solution using lsqr
-x_ls = lsqr(AA, B, 1e-10, 5000);
-x_ls = reshape(x_ls, [rows, cols, dim]);
-%solution using inverse - takes a while
-Xest = ((A'*A) + lambda*(L'*L))\(A'*y);
+rng(123);
+n = rows*cols*dim;
+x0 = 0.5*rand(n, 1);
 
-residual_ls = sum(sum((x_ls(:) - Xest(:)).^2));
+%% solution using CG
+[xx, yy, zz] = meshgrid(1:19, 1:19, 1:19);
+for toThePow = [-3 -5 -7],
+    lambda = 10^toThePow;
+    AA = [A; sqrt(lambda)*L];
+    x_cg = CG_LS1(x0,AA,B,tol,maxIter);
+    X = reshape(x_cg, [rows, cols, dim]);
+    % displayVolumeSliceGUI(X);
 
-X = reshape(x_ls, [rows, cols, dim]);
-displayVolumeSliceGUI(X);
-
-%% Large
-clear; close all;
-load('Large\A');
-load('Large\y');
-
-rows = 49;
-cols = 49;
-dim  = 49;
-[Dx, Dy, Dz] = CreateDerivativeOperators3D(rows, cols, dim);
-
-lambda = 1e-5;
-
-L = [Dx; Dy; Dz];
-AA = [A; sqrt(lambda)*L];
-B = [y; zeros(size(L, 1), 1)];
-%Solution using lsqr
-x_ls = lsqr(AA, B, 1e-10, 5000);
-x_ls = reshape(x_ls, [rows, cols, dim]);
-
-X = reshape(x_ls, [rows, cols, dim]);
-displayVolumeSliceGUI(X);
-
-X = reshape(x_ls, [rows, cols, dim]);
-displayVolumeSliceGUI(X);
+    figure;
+    p = patch(isosurface(xx,yy,zz,X,0.5));
+    isonormals(xx,yy,zz,X,p)
+    set(p,'FaceColor','r')
+    set(p,'EdgeColor','r')
+    daspect([1,1,1])
+    view(3); axis tight
+    camlight
+    lighting gouraud
+    title(['$ \lambda = 10^{' num2str(toThePow) '} $'],'interpreter','latex')
+end
