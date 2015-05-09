@@ -11,19 +11,19 @@ figure(1);
 subplot(221);
 plot(t, abs(Dx*f1));
 xlabel('x');
-title('||Dx*f1(x)||_1');
+title(['||Dx*f1(x)||_1 = ' num2str(sum(abs(Dx*f1)))]);
 
 subplot(222);
 plot(t, abs(Dx*f2));
 xlabel('x');
-title('||Dx*f2(x)||_1');
+title(['||Dx*f2(x)||_1 = ' num2str(sum(abs(Dx*f2)))]);
 
 subplot(223);
 plot(t, (Dx*f1).^2);
 xlabel('x');
-title('||Dx*f1(x)||_2');
+title(['||Dx*f1(x)||_2 = ' num2str(sum((Dx*f1).^2))]);
 
 subplot(224);
 plot(t, (Dx*f2).^2);
 xlabel('x');
-title('||Dx*f2(x)||_2');
+title(['||Dx*f2(x)||_2 = ' num2str(sum((Dx*f2).^2))]);
