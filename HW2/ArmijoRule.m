@@ -29,10 +29,10 @@ while (f(x) - f_k > alpha*sigma*gradf_k'*d_k)
     %backtrack
     if ( flag == 0 )
         % straight line
-        x = x + alpha*d_k;
+        x = x_k + alpha*d_k;
     else
         % projection on convex set B: x = Proj_B(x+alpha*d_k)
-        x = Proj_B(x + alpha*d_k);%not implemented yet
+        x = Proj_B(x_k + alpha*d_k);%not implemented yet
     end
 end
 

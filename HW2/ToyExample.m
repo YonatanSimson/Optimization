@@ -14,7 +14,7 @@ beta  = 0.6;
 flag = 0;
 %Init
 x = [0; 0];
-alpha_k = 1;
+alpha_k = 0.9;
 %iterate
 for k = 1:maxIter,
     d = -gradf(x);
