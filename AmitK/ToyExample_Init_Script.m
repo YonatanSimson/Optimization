@@ -51,11 +51,11 @@ x_ClosedForm=tmp*y;
 XX = reshape(x_ClosedForm,5,5);
 
  %Lsqr solution:
- b_lsqr=(A') *  y;
- A_lsqr=((A')*A+l*(L')*L);
- x_lsqr=lsqr(A_lsqr,b_lsqr,1e-30,30);%seems that max iteration num is 25 -> limitted to the size of x
+ b_wave=(A') *  y;
+ A_wave=((A')*A+l*(L')*L);
+ x_lsqr=lsqr(A_wave,b_wave,1e-30,30);%seems that max iteration num is 25 -> limitted to the size of x
 
- x_pcg = pcg(A_lsqr,b_lsqr,1e-30,100);
+ x_pcg = pcg(A_wave,b_wave,1e-30,100);
  
  %Notes:
 %  norm([x-x_lsqr])
@@ -71,13 +71,13 @@ XX = reshape(x_ClosedForm,5,5);
 %   1.1204e-010
  
 %Precoditioning:
-R = chol(A_lsqr);%A_lsqr=R'*R; Cholesky
+R = chol(A_wave);%A_lsqr=R'*R; Cholesky
 P = inv(R);
-x_lsqr_preCond=lsqr(A_lsqr,b_lsqr,1e-30,30,(inv(P))',inv(P));
-'lsqr precond quality:'
+x_lsqr_preCond=lsqr(A_wave,b_wave,1e-30,30,(inv(P))',inv(P));
+disp('lsqr precond quality:')
 norm(x_ClosedForm-x_lsqr_preCond)
 
-x_pcg_precond = pcg(A_lsqr,b_lsqr,1e-30,100,(inv(P))',inv(P));
-'pcg precond quality:'
+x_pcg_precond = pcg(A_wave,b_wave,1e-30,100,(inv(P))',inv(P));
+disp('pcg precond quality:')
 norm(x_ClosedForm-x_pcg_precond)
  
