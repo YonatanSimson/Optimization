@@ -9,7 +9,7 @@ gradf = @(x)(2*(x-[-1;0.5]));
 %params
 maxIter = 100;
 tol = 1e-8;
-sigma = 0.3;
+sigma = 0.2;
 beta  = 0.6;
 flag = 1;
 %Init
@@ -26,7 +26,6 @@ for k = 1:maxIter,
         break;
     end
     %a_k = arg min(f + a*d)
-    %alpha = GoldenSectionLineSearch(@(t)f(x+t*d), 0, alpha_k, maxIter, tol);
     alpha_k = ArmijoRule(f, x, f(x), gradf(x), d, sigma, beta, alpha_k, lb, ub, flag);
     %update
     xOld = x;
