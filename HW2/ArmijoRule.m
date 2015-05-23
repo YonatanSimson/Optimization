@@ -1,4 +1,4 @@
-function alpha = ArmijoRule(f, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0, flag)
+function alpha = ArmijoRule(f, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0, lb, ub, flag)
 %INPUT:
 % f - handle to function f()
 % x_k - x at current iteration
@@ -8,6 +8,8 @@ function alpha = ArmijoRule(f, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0, fla
 % sigma - a bigger sigma make the search more conservative
 % beta - smaller beta makes the line search converge faster at the expense
 % of accuracy
+% lb - lower bound of box constraints
+% ub - upper bound of box constraints
 % flag - 0: bactrack on straight line, 1:Project on convex set B
 %
 %OUTPUT:
@@ -24,7 +26,7 @@ function alpha = ArmijoRule(f, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0, fla
 alpha = alpha_0;
 x = x_k + alpha*d_k;
 %Iterate
-while (f(x) - f_k > alpha*sigma*gradf_k'*d_k)
+while (f(x) - f_k > sigma*gradf_k'*(x - x_k))
     alpha = beta*alpha;%shrink alpha
     %backtrack
     if ( flag == 0 )
@@ -32,10 +34,13 @@ while (f(x) - f_k > alpha*sigma*gradf_k'*d_k)
         x = x_k + alpha*d_k;
     else
         % projection on convex set B: x = Proj_B(x+alpha*d_k)
-        x = Proj_B(x_k + alpha*d_k);%not implemented yet
+        x = Proj_B(x_k + alpha*d_k, lb, ub);%not implemented yet
     end
 end
 
-    
+
+
+
+
 
 
