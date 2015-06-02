@@ -3,7 +3,7 @@ load('xForTraining.mat')
 load('labelsForTraining.mat')
 load('coeff.mat')
 X = ExtractFeatures(xForTraining, coeff);
-w  =  sqrt(size(xForTraining, 1));
+wImg  =  sqrt(size(xForTraining, 1));
 y = labelsForTraining;
 
 y(y==0) = -1;
@@ -51,5 +51,7 @@ bndind = find(alpha > tol * C & alpha < (1 - tol) * C) ;
 w = A(:, bndind)*lambda(bndind);
 %find w0
 w0 = mean(y(bndind)-w'*X(:, bndind));
+
+%try on test set
 
 

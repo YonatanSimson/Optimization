@@ -47,6 +47,7 @@ for k = 1:maxIter,
     P  = sparse(1:dim, [nonActive; active;], ones(dim, 1));%permuation matrix
     Hr = eye(dim);
     Hr(1:numel(nonActive), 1:numel(nonActive)) = H(nonActive,nonActive);
+    Hr = H;
     % Find descent direction
     if ( isempty(nonActive) )
         d = -gradf_x; %Projected gradient descent
