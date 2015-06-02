@@ -1,4 +1,4 @@
-function [x, active, Cost] = ProjectedNewton(H, b, lb, ub, x0, maxIter, tol)
+function [x, active, Cost] = ProjectedNewton(H, b, lb, ub, x0, maxIter, tol, tolkkt)
 % Solves the following problem via Projected Newton:
 %
 %   minimize     (1/2)*x'*H*x + b'*x
@@ -14,7 +14,7 @@ tolInner = 1e-10;% For CG - for inverting Hessian. Inner loop
 sigma = 0.2;% For Armijo rule
 beta  = 0.6;% For Armijo rule
 flag = 1;% For Armijo rule: 0 - unconstrained, 1-constrained case with box constraints
-epsilon = 1e-6;%For active set on the box constraints
+% epsilon = 1e-6;%For active set on the box constraints
 %Init
 alpha_k = 0.9;
 Cost = zeros(1, maxIter);
@@ -35,7 +35,7 @@ for k = 1:maxIter,
     end
     gradf_x = gradf(x);
     % Find active set
-    IPlus = ActiveSet(x, gradf_x, lb, ub, epsilon);
+    IPlus = ActiveSet(x, gradf_x, lb, ub, tolkkt);
     active    = find(IPlus);
     nonActive = find(~IPlus);
     % Find descent direction
