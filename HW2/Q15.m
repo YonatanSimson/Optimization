@@ -12,7 +12,7 @@ y(y==9) = +1;
 %% PARAMTERS
 C = 1;
 epsilon = 1e-6;
-maxIter = 1000;%For Projected Newton
+maxIter = 200000;%For Projected Newton
 tol = 1e-8;%For Projected Newton
 n = size(A, 1);
 N = size(A, 2);%number of training samples
@@ -52,6 +52,26 @@ w = A(:, bndind)*lambda(bndind);
 %find w0
 w0 = mean(y(bndind)-w'*X(:, bndind));
 
-%try on test set
+y_est = 2*(w'*X + w0 > 0)'-1;
+%accuracy for training set
+accuracy_train = sum(y_est==y)/length(y);
 
+opts = svmsmoset('MaxIter',200000);
+svmtrain(x,y,'METHOD','SMO','SMO OPTS',opts,'BOXCONSTRAINT',C,'AUTOSCALE',
+false);
+With 
+
+%% Test
+load('xForTest.mat')
+load('labelsForTest.mat')
+Xtest = ExtractFeatures(xForTest, coeff);
+y_test = labelsForTest;
+
+y_test(y_test==0) = -1;
+y_test(y_test==9) = +1;
+
+
+y_test_est = 2*(w'*Xtest + w0 > 0)'-1;
+
+accuracy_test = sum(y_test_est==y_test)/length(y_test);
 
