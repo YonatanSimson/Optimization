@@ -32,7 +32,7 @@ n = numel(y) ;
 Y = diag(y) ;
 %K = X'*X; H = Y*K*Y; Andrea Vadaldi form
 options = optimset('Algorithm', 'interior-point-convex',...
-    'Display','on', ...
+    'Display','final-detailed', ...
     'LargeScale', 'on', ...
     'TolFun',tol, ...
     'MaxIter', maxIter);
@@ -56,8 +56,8 @@ accuracy_train = sum(y_est==y)/length(y);
 
 
 %% Matlab SVM reference
-opts = statset('MaxIter',200000);
-SVMStruct = svmtrain(X,y,'METHOD','SMO','options',opts,'BOXCONSTRAINT',ub,'AUTOSCALE',false);
+svm_opts = statset('MaxIter',200000);
+SVMStruct = svmtrain(X,y,'METHOD','SMO','options',svm_opts,'BOXCONSTRAINT',ub,'AUTOSCALE',false);
 y_est_ref = svmclassify(SVMStruct,X');
 accuracy_train_ref = sum(y_est_ref==y)/length(y)*100;
 
@@ -68,19 +68,27 @@ eta0 = 1;
 beta = 10;
 ytag_y = y'*y;
 
+%init
 mu = mu0;
 eta = eta0;
-lambda = lambda0;
+alpha = lambda0;
 
 %iterate
-Htild = He + mu*ytag_y;%For augmented form
-b     = ones(N, 1) + eta*y;%For augmented form
-[lambda, active, Cost] = ProjectedNewton(H, b, lb, ub, lambda, maxIter, tol, tolkkt);
-%update mu,eta
-eta = eta - mu*y'*lambda;
-mu  = mu*beta;
-
-
+for k = 1:10,
+    Htild = He + mu*ytag_y;%For augmented form
+    b     = -ones(N, 1) - eta*y;%For augmented form
+    % [lambda, active, Cost] = ProjectedNewton(H, b, lb, ub, lambda, 2000, tol, tolkkt);
+    alpha = quadprog(Htild, b, ...
+                     [], [], ...
+                     [], [], ...%equality cond
+                     lb, ub, ...%box constraints
+                     [], ...%starting point
+                     options) ;%instead of projected Newton
+    %update mu,eta
+    eta = eta - mu*y'*alpha;
+    mu  = mu*beta;
+end
+norm(alpha - lambda)
 %% Test
 load('xForTest.mat')
 load('labelsForTest.mat')
