@@ -99,7 +99,7 @@ for k = 1:MaxIterAug,
 %                      lb, ub, ...%box constraints
 %                      alpha, ...%starting point
 %                      options) ;%instead of projected Newton
-    EqCost(k) = y'*alpha;
+    EqCost(k) = (y'*alpha).^2;
     CostMin(k) = 0.5* alpha' * H * alpha - ones_N' * alpha;
     %update mu,eta
     eta = eta - mu*y'*alpha;
