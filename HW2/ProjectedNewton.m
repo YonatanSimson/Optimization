@@ -1,4 +1,4 @@
-function [x, active, Cost] = ProjectedNewton(H, b, lb, ub, x0, maxIter, tol, tolkkt)
+function [x, Cost] = ProjectedNewton(H, b, lb, ub, x0, maxIter, tol, tolkkt)
 % Solves the following problem via Projected Newton:
 %
 %   minimize     (1/2)*x'*H*x + b'*x
@@ -31,7 +31,7 @@ Hr = ones(dim); %#ok<NASGU>
 for k = 1:maxIter,
     if (norm(x-xOld)<tol)
         disp(['ProjectedNewton converged at iteration ' num2str(k)]);
-        Cost = Cost(1:k-1);
+        Cost = f(x);
         break;
     end
     gradf_x = gradf(x);
