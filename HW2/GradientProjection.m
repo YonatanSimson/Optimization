@@ -14,7 +14,6 @@ beta  = 0.6;% For Armijo rule
 flag = 1;% For Armijo rule: 0 - unconstrained, 1-constrained case with box constraints
 %Init
 alpha_k = 0.9;
-Cost = zeros(1, maxIter);
 
 %iterate
 xOld = inf(length(x0), 1);
@@ -23,7 +22,6 @@ for k = 1:maxIter,
     d = -gradf(x);
     if (norm(x-xOld)<tol)
         disp(['Converged at iteration ' num2str(k)]);
-        Cost = Cost(1:k);
         break;
     end
     %a_k = arg min(f + a*d)
@@ -32,4 +30,4 @@ for k = 1:maxIter,
     xOld = x;
     x = Proj_B(x + alpha_k*d, lb, ub);
 end
-CostFinal = Cost(end);
+CostFinal = f(x);
