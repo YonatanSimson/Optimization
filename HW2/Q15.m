@@ -68,7 +68,7 @@ lambda0 = 0.5*ones_N*C;
 mu0 = 10;
 eta0 = 1;
 beta = 10.01;
-ytag_y = y'*y;
+y_y_tag = y*y';
 MaxIterAug = 1000;
 %init
 mu = mu0;
@@ -85,10 +85,10 @@ options = optimset('Algorithm', 'trust-region-reflective',...
     'TolFun',tol, ...
     'MaxIter', maxIter);
 for k = 1:MaxIterAug,
-    Htild = He + mu*ytag_y;%For augmented form
+    Htild = He + mu*y_y_tag;%For augmented form
     b     = -ones(N, 1) - eta*y;%For augmented form
-    f = @(x)(0.5* x' * Htild * x + mu/2 * (y'* x)^2 - ones_N' * x - eta * x' * y);
-    gradf = @(x)(Htild* x + mu * y * (y'* x) - ones_N - eta * y) ;
+    f = @(x)(0.5* x' * He * x + mu/2 * (y'* x)^2 - ones_N' * x - eta * x' * y);
+    gradf = @(x)(He* x + mu * y * (y'* x) - ones_N - eta * y) ;
 %     [lambda, CostTot(k)] = ProjectedNewton(H, b, lb, ub, lambda, 2000, tol, tolkkt);
 %     [lambda, CostTot(k)] = ProjectedNewton_v2(H, f, gradf, b, lb, ub, lambda, 2000, tol, tolkkt);
 
@@ -100,7 +100,7 @@ for k = 1:MaxIterAug,
 %                      alpha, ...%starting point
 %                      options) ;%instead of projected Newton
     EqCost(k) = y'*alpha;
-    CostMin(k) = f(alpha);
+    CostMin(k) = 0.5* alpha' * H * alpha - ones_N' * alpha;
     %update mu,eta
     eta = eta - mu*y'*alpha;
     mu  = mu*beta;
