@@ -1,5 +1,5 @@
 clear; close all;
-%Toy Example for Armijo rule
+%Toy Example for Augmented Lagrangian
 H=[5 -2 -1; -2 4 3; -1 3 5];
 c=[2; -35; -47];
 Aeq = [1 1 1];
@@ -12,7 +12,7 @@ x_ref = quadprog(H,c,[],[],Aeq, beq, lb,ub, [], options);
 x_unc = quadprog(H,c,[],[],[], [], [],[], [], options);
 tol = 1e-8;
 maxIter = 100;
-x_cg = ConjGrad(H,-c,[3; 3; 3], maxIter, tol);
+tolkkt = 1e-3;
 
 %% Augmented Lagrangian
 mu0 = 1;
@@ -53,16 +53,15 @@ for k = 1:MaxIterAug,
     end
     f = @(x)(0.5* x' * H * x + c' * x + mu/2 * (Aeq * x - beq)^2  - eta * (Aeq * x - beq));
     gradf = @(x)(H * x + c + mu * ((Aeq' * Aeq) * x - Aeq'* beq) - eta * Aeq') ;
-%     [lambda, CostTot(k)] = ProjectedNewton(H, b, lb, ub, lambda, 2000, tol, tolkkt);
-%     [lambda, CostTot(k)] = ProjectedNewton_v2(H, f, gradf, b, lb, ub, lambda, 2000, tol, tolkkt);
+    [x, CostTot(k)] = ProjectedNewton(Htild, cTild, lb, ub, x, 2000, tol, tolkkt);
 
 %     [x, CostTot(k)] = GradientProjection(f, gradf, lb, ub, x, maxIter, tol);
-    [x, CostTot(k)] = quadprog(Htild, cTild, ...
-                     [], [], ...
-                     [], [], ...%equality cond
-                     lb, ub, ...%box constraints
-                     x, ...%starting point
-                     options) ;%instead of projected Newton
+%     [x, CostTot(k)] = quadprog(Htild, cTild, ...
+%                      [], [], ...
+%                      [], [], ...%equality cond
+%                      lb, ub, ...%box constraints
+%                      x, ...%starting point
+%                      options) ;%instead of projected Newton
     EqCost(k) = sum((Aeq * x - beq).^2);
     CostMin(k) = 0.5* x' * H * x + c' * x;
     %update mu,eta
@@ -71,8 +70,6 @@ for k = 1:MaxIterAug,
 
     disp('Augmented Lagragian iteration')
     disp(k)
-    disp('Distance from ref:')
-    norm(x - x_ref)
     xOld = x;
 
 end

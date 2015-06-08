@@ -21,7 +21,7 @@ x = x0;
 for k = 1:maxIter,
     d = -gradf(x);
     if (norm(x-xOld)<tol)
-        disp(['Converged at iteration ' num2str(k)]);
+        disp(['GradientProjection Converged at iteration ' num2str(k)]);
         break;
     end
     %a_k = arg min(f + a*d)

@@ -30,7 +30,7 @@ Hr = ones(dim); %#ok<NASGU>
 
 for k = 1:maxIter,
     if (norm(x-xOld)<tol)
-        disp(['Converged at iteration ' num2str(k)]);
+        disp(['ProjectedNewton converged at iteration ' num2str(k)]);
         Cost = Cost(1:k-1);
         break;
     end
