@@ -12,9 +12,9 @@ y(y==9) = +1;
 
 %% PARAMTERS
 C = 1;
-epsilon = 1e-12;
+epsilon = 1e-6;
 maxIter = 200000;%For Projected Newton
-tol = 1e-8;%For Projected Newton
+tol = 1e-10;%For Projected Newton
 tolkkt = 1e-3;
 n = size(X, 1);%dimension of w
 N = size(X, 2);%number of training samples
@@ -62,7 +62,7 @@ SVMStruct = svmtrain(X,y,'METHOD','SMO','options',svm_opts,'BOXCONSTRAINT',ub,'A
 y_est_ref = svmclassify(SVMStruct,X');
 accuracy_train_ref = sum(y_est_ref==y)/length(y)*100;
 
-%% Solve with augmented lagrangian - not finished
+%% Solve with augmented lagrangian
 ones_N = ones(N, 1);
 lambda0 = 0.5*ones_N*C;
 mu0 = 10;
@@ -70,10 +70,14 @@ eta0 = 1;
 beta = 10.01;
 y_y_tag = y*y';
 MaxIterAug = 1000;
+
+% [ alpha ] = AugmentedLagrangian( He, -ones_N, y', 0, lb, ub, maxIter, tol, tolkkt, mu0, eta0, beta, MaxIterAug );
+
 %init
 mu = mu0;
 eta = eta0;
 alpha = lambda0;
+alphaOld = inf(length(lambda0), 1);
 
 %iterate
 CostTot = zeros(1, MaxIterAug);
@@ -85,6 +89,16 @@ options = optimset('Algorithm', 'trust-region-reflective',...
     'TolFun',tol, ...
     'MaxIter', maxIter);
 for k = 1:MaxIterAug,
+    if ( sum((y'*alpha).^2) < tol && ...
+            norm(alpha-alphaOld) < tol)
+        CostTot = CostTot(1:k-1);
+        CostMin = CostMin(1:k-1);
+        EqCost = EqCost(1:k-1);
+        
+        disp('Augmented Lagragian converged at iteration')
+        disp(k)
+        break;
+    end
     Htild = He + mu*y_y_tag;%For augmented form
     b     = -ones(N, 1) - eta*y;%For augmented form
     f = @(x)(0.5* x' * He * x + mu/2 * (y'* x)^2 - ones_N' * x - eta * x' * y);
@@ -92,13 +106,13 @@ for k = 1:MaxIterAug,
 %     [lambda, CostTot(k)] = ProjectedNewton(H, b, lb, ub, lambda, 2000, tol, tolkkt);
 %     [lambda, CostTot(k)] = ProjectedNewton_v2(H, f, gradf, b, lb, ub, lambda, 2000, tol, tolkkt);
 
-    [alpha, CostTot(k)] = GradientProjection(f, gradf, lb, ub, alpha, maxIter, tol);
-%     [alpha, CostTot(k)] = quadprog(Htild, b, ...
-%                      [], [], ...
-%                      [], [], ...%equality cond
-%                      lb, ub, ...%box constraints
-%                      alpha, ...%starting point
-%                      options) ;%instead of projected Newton
+%     [alpha, CostTot(k)] = GradientProjection(f, gradf, lb, ub, alpha, maxIter, tol);
+    [alpha, CostTot(k)] = quadprog(Htild, b, ...
+                     [], [], ...
+                     [], [], ...%equality cond
+                     lb, ub, ...%box constraints
+                     alpha, ...%starting point
+                     options) ;%instead of projected Newton
     EqCost(k) = (y'*alpha).^2;
     CostMin(k) = 0.5* alpha' * H * alpha - ones_N' * alpha;
     %update mu,eta
@@ -109,6 +123,7 @@ for k = 1:MaxIterAug,
     disp(k)
     disp('Distance from ref:')
     norm(alpha - lambda)
+    alphaOld = alpha;
 end
 norm(alpha - lambda)
 %% Test
