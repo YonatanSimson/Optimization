@@ -9,8 +9,8 @@ function [x, CostFinal] = GradientProjection(f, gradf, lb, ub, x0, maxIter, tol)
 %   active - Set of active constraints
 %   Cost - vector of decreasing cost
 %PARAMS
-sigma = 0.2;% For Armijo rule
-beta  = 0.6;% For Armijo rule
+sigma = 0.3;% For Armijo rule
+beta  = 0.1;% For Armijo rule
 flag = 1;% For Armijo rule: 0 - unconstrained, 1-constrained case with box constraints
 %Init
 alpha_k = 0.9;
@@ -20,7 +20,7 @@ xOld = inf(length(x0), 1);
 x = x0;
 for k = 1:maxIter,
     d = -gradf(x);
-    if (norm(x-xOld)<tol)
+    if (norm(x-xOld)<tol*norm(xOld))
         disp(['GradientProjection Converged at iteration ' num2str(k)]);
         break;
     end

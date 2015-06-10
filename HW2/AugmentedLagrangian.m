@@ -31,11 +31,11 @@ for k = 1:MaxIterAug,
         disp(k)
         break;
     end
-    [x, CostTot(k)] = ProjectedNewton(Htild, cTild, lb, ub, x, maxIter, tol, tolkkt);
+    %[x, CostTot(k)] = ProjectedNewton(Htild, cTild, lb, ub, x, maxIter, tol, tolkkt);
 
-%     f = @(x)(0.5* x' * H * x + c' * x + mu/2 * (Aeq * x - beq)^2  - eta * (Aeq * x - beq));
-%     gradf = @(x)(H * x + c + mu * ((Aeq' * Aeq) * x - Aeq'* beq) - eta * Aeq') ;
-%     [x, CostTot(k)] = GradientProjection(f, gradf, lb, ub, x, maxIter, tol);
+    f = @(x)(0.5* x' * H * x + c' * x + mu/2 * (Aeq * x - beq)^2  - eta * (Aeq * x - beq));
+    gradf = @(x)(H * x + c + mu * ((Aeq' * Aeq) * x - Aeq'* beq) - eta * Aeq') ;
+    [x, CostTot(k)] = GradientProjection(f, gradf, lb, ub, x, maxIter, tol);
 %     [x, CostTot(k)] = quadprog(Htild, cTild, ...
 %                      [], [], ...
 %                      [], [], ...%equality cond

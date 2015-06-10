@@ -1,4 +1,6 @@
 close all; clear;
+Flag = 'projGrad'; %projGrad, projNewton, quadprog
+
 %% INPUTS
 load('xForTraining.mat')
 load('labelsForTraining.mat')
@@ -13,8 +15,8 @@ y(y==9) = +1;
 %% PARAMTERS
 C = 1;
 epsilon = 1e-6;
-maxIter = 200000;%For Projected Newton
-tol = 1e-10;%For Projected Newton
+maxIter = 200000;%For Projected Newton/Gradient Projection
+tol = 1e-10;%For Projected Newton/Gradient Projection
 tolkkt = 1e-3;
 n = size(X, 1);%dimension of w
 N = size(X, 2);%number of training samples
@@ -42,25 +44,19 @@ lambda = quadprog(H, b, ...
                  y', 0, ...%equality cond
                  lb, ub, ...%box constraints
                  [], options) ;
-             
-%Find Inactive set, 0<lambda<C
-bndind = find(lambda > tolkkt * C & lambda < (1 - tolkkt) * C) ;
-%Find w
-w = A(:, bndind)*lambda(bndind);
-%find w0
-w0 = mean(y(bndind)'-w'*X(:, bndind));
 
-y_est = sign(w'*X + w0)';
-y_est(y_est==0) = 1;
+[ w_qp, w0_qp ] = GetW( X, y, lambda, tolkkt, C );
+y_train_qp = svm_est(X, w_qp, w0_qp);
+
 %accuracy for training set
-accuracy_train = sum(y_est==y)/length(y);
+accuracy_train_qp = sum(y_train_qp==y)/length(y)*100;
 
 
 %% Matlab SVM reference
 svm_opts = statset('MaxIter',200000);
 SVMStruct = svmtrain(X,y,'METHOD','SMO','options',svm_opts,'BOXCONSTRAINT',ub,'AUTOSCALE',false);
-y_est_ref = svmclassify(SVMStruct,X');
-accuracy_train_ref = sum(y_est_ref==y)/length(y)*100;
+y_train_ref = svmclassify(SVMStruct,X');
+accuracy_train_ref = sum(y_train_ref==y)/length(y)*100;
 
 %% Solve with augmented lagrangian
 ones_N = ones(N, 1);
@@ -70,8 +66,8 @@ eta0 = 1;
 beta = 10.01;
 y_y_tag = y*y';
 MaxIterAug = 1000;
-
-% [ alpha ] = AugmentedLagrangian( He, -ones_N, y', 0, lb, ub, maxIter, tol, tolkkt, mu0, eta0, beta, MaxIterAug );
+maxIter    = 50000;
+tol        = 1e-6;
 
 %init
 mu = mu0;
@@ -103,16 +99,18 @@ for k = 1:MaxIterAug,
     b     = -ones(N, 1) - eta*y;%For augmented form
     f = @(x)(0.5* x' * He * x + mu/2 * (y'* x)^2 - ones_N' * x - eta * x' * y);
     gradf = @(x)(He* x + mu * y * (y'* x) - ones_N - eta * y) ;
-%     [lambda, CostTot(k)] = ProjectedNewton(H, b, lb, ub, lambda, 2000, tol, tolkkt);
-%     [lambda, CostTot(k)] = ProjectedNewton_v2(H, f, gradf, b, lb, ub, lambda, 2000, tol, tolkkt);
-
-%     [alpha, CostTot(k)] = GradientProjection(f, gradf, lb, ub, alpha, maxIter, tol);
-    [alpha, CostTot(k)] = quadprog(Htild, b, ...
-                     [], [], ...
-                     [], [], ...%equality cond
-                     lb, ub, ...%box constraints
-                     alpha, ...%starting point
-                     options) ;%instead of projected Newton
+    if ( strcmp(Flag, 'projGrad') )
+        [alpha, CostTot(k)] = GradientProjection(f, gradf, lb, ub, alpha, maxIter, tol);
+    elseif( strcmp(Flag, 'projNewton') )
+        [alpha, CostTot(k)] = ProjectedNewton(Htild, b, lb, ub, alpha, maxIter, tol, tolkkt);
+    else
+        [alpha1, CC] = quadprog(Htild, b, ...
+                         [], [], ...
+                         [], [], ...%equality cond
+                         lb, ub, ...%box constraints
+                         alpha, ...%starting point
+                         options) ;
+    end
     EqCost(k) = (y'*alpha).^2;
     CostMin(k) = 0.5* alpha' * H * alpha - ones_N' * alpha;
     %update mu,eta
@@ -126,7 +124,15 @@ for k = 1:MaxIterAug,
     alphaOld = alpha;
 end
 norm(alpha - lambda)
-%% Test
+
+%train results from augmeted lagrangian
+[ w_al, w0_al ] = GetW( X, y, alpha, tolkkt, C );
+y_train_al = svm_est(X, w_al, w0_al);
+%accuracy for training set
+accuracy_train_al = sum(y_train_al==y)/length(y)*100;
+disp(['Trainining set accuracy: ' num2str(accuracy_train_al)])
+
+%% Test - Q16
 load('xForTest.mat')
 load('labelsForTest.mat')
 Xtest = ExtractFeatures(xForTest, coeff);
@@ -136,9 +142,13 @@ y_test(y_test==0) = -1;
 y_test(y_test==9) = +1;
 
 
-y_test_est = sign(w'*Xtest + w0)';
-y_test_est(y_test_est==0) = 1;
+%accuracy for test set - AL
+y_test_al = svm_est(Xtest, w_al, w0_al);
+accuracy_train_al = sum(y_test_al==y_test)/length(y_test)*100;
 
+%accuracy for test set - Reference
+y_test_ref = svmclassify(SVMStruct, Xtest');
+accuracy_test_ref = sum(y_test_ref==y_test)/length(y_test)*100;
 
-accuracy_test = sum(y_test_est==y_test)/length(y_test)*100;
+disp(['Test set accuracy: ' num2str(accuracy_train_al)])
 
