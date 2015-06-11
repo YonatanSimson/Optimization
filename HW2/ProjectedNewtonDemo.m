@@ -12,12 +12,12 @@ maxIterInner = 1000;
 tolInner = 1e-10;
 tolkkt = 1e-3;
 tol = 1e-8;
-maxIter = 100;
+maxIter = 1000;
 x_cg = ConjGrad(H,-c,[3; 3; 3], maxIter, tol);
 
 %% my Projected Newton
 x0 = 0.5*(lb + ub);
-[x_pn, active, Cost] = ProjectedNewton(H, c, lb, ub, x0, maxIter, tol, tolkkt);
+[x_pn, Cost] = ProjectedNewton(H, c, lb, ub, x0, maxIter, tol, tolkkt);
 disp('Accuracy of Projected Newton')
 norm(x_pn - x_ref)
 

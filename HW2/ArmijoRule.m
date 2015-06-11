@@ -4,7 +4,7 @@ function alpha = ArmijoRule(f, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0, lb,
 % x_k - x at current iteration
 % f_k - f(x_k)
 % gradk_k - grad(f(x_k))
-% d_k - usually equals -grad(f(x_k))
+% d_k - can be -grad(f(x_k)) or H^-1*grad(f(x_k))
 % sigma - a bigger sigma make the search more conservative
 % beta - smaller beta makes the line search converge faster at the expense
 % of accuracy
@@ -25,6 +25,7 @@ function alpha = ArmijoRule(f, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0, lb,
 %Init
 alpha = alpha_0;
 x = x_k + alpha*d_k;
+k = 1;
 %Iterate
 while (f(x) - f_k > sigma*gradf_k'*(x - x_k))
     alpha = beta*alpha;%shrink alpha
@@ -35,6 +36,10 @@ while (f(x) - f_k > sigma*gradf_k'*(x - x_k))
     else
         % projection on convex set B: x = Proj_B(x+alpha*d_k)
         x = Proj_B(x_k + alpha*d_k, lb, ub);%not implemented yet
+    end
+    k = k + 1;
+    if ( k >= 100 )
+        disp('warning: Armijo rule not converging, k> 100');
     end
 end
 

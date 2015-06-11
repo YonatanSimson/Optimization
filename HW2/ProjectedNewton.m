@@ -10,14 +10,12 @@ function [x, Cost] = ProjectedNewton(H, b, lb, ub, x0, maxIter, tol, tolkkt)
 %   Cost - vector of decreasing cost
 %PARAMS
 maxIterInner = 1000;% For CG - for inverting Hessian. Inner loop
-tolInner = 1e-10;% For CG - for inverting Hessian. Inner loop
-sigma = 0.2;% For Armijo rule
-beta  = 0.6;% For Armijo rule
+tolInner = 1e-8;% For CG - for inverting Hessian. Inner loop
+sigma = 0.3;% For Armijo rule
+beta  = 0.1;% For Armijo rule
 flag = 1;% For Armijo rule: 0 - unconstrained, 1-constrained case with box constraints
-% epsilon = 1e-6;%For active set on the box constraints
 %Init
 alpha_k = 0.9;
-Cost = zeros(1, maxIter);
 
 f = @(x)(0.5*x'*H*x+b'*x);
 gradf = @(x)(H*x+b);
@@ -27,29 +25,27 @@ xOld = inf(length(x0), 1);
 x = x0;
 dim = length(x0);
 Hr = ones(dim); %#ok<NASGU>
-
+d = zeros(dim, 1);
 for k = 1:maxIter,
-    if (norm(x-xOld)<tol)
+    if (norm(x-xOld)<tol*norm(xOld))
         disp(['ProjectedNewton converged at iteration ' num2str(k)]);
-        Cost = f(x);
         break;
     end
     gradf_x = gradf(x);
     % Find active set
     IPlus = ActiveSet(x, gradf_x, lb, ub, tolkkt);
-    active    = find(IPlus);
     nonActive = find(~IPlus);
+    active    = find(IPlus);
     % Find descent direction
     if ( isempty(nonActive) )
         d = -gradf_x; %Projected gradient descent
     else
         % Newton step
-        P  = sparse(1:dim, [nonActive; active;], ones(dim, 1));%permuation matrix
-        Hr = eye(dim);
-        Hr(1:numel(nonActive), 1:numel(nonActive)) = H(nonActive,nonActive);
-        % dr = -Hr\(P*gradf_x);
-        dr = ConjGrad(Hr, -P*gradf_x, -P*gradf_x, maxIterInner, tolInner); 
-        d = P'*dr;
+        dd = -H(nonActive,nonActive)\gradf_x(nonActive); 
+        d(nonActive) = dd;
+        d(IPlus)     = -gradf_x(IPlus);
+        %dr = ConjGrad(Hr, -P*gradf_x, -P*gradf_x, maxIterInner, tolInner); 
+
     end
     
     % a_k ~ arg min(f + a*d)
@@ -57,4 +53,10 @@ for k = 1:maxIter,
     %update
     xOld = x;
     x = Proj_B(x + alpha_k*d, lb, ub);
+    if (mod(k, 500)==0)
+        disp('Newton Iteration:')
+        k
+    end
 end
+
+Cost = f(x);
