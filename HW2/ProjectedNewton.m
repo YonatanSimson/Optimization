@@ -15,7 +15,7 @@ sigma = 0.3;% For Armijo rule
 beta  = 0.1;% For Armijo rule
 flag = 1;% For Armijo rule: 0 - unconstrained, 1-constrained case with box constraints
 %Init
-alpha_k = 0.9;
+alpha_k = 0.99;
 
 f = @(x)(0.5*x'*H*x+b'*x);
 gradf = @(x)(H*x+b);
@@ -28,7 +28,6 @@ Hr = ones(dim); %#ok<NASGU>
 d = zeros(dim, 1);
 for k = 1:maxIter,
     if (norm(x-xOld)<tol*norm(xOld))
-        disp(['ProjectedNewton converged at iteration ' num2str(k)]);
         break;
     end
     gradf_x = gradf(x);
@@ -53,10 +52,9 @@ for k = 1:maxIter,
     %update
     xOld = x;
     x = Proj_B(x + alpha_k*d, lb, ub);
-    if (mod(k, 500)==0)
-        disp('Newton Iteration:')
-        k
+    if (mod(k, 1000)==0)
+        disp(['Newton Iteration: ' num2str(k)])
     end
 end
-
+disp(['ProjectedNewton converged at iteration ' num2str(k)]);
 Cost = f(x);

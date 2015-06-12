@@ -1,5 +1,5 @@
 close all; clear;
-Flag = 'projGrad'; %projGrad, projNewton, quadprog
+Flag = 'projNewton'; %projGrad, projNewton, quadprog
 
 %% INPUTS
 load('xForTraining.mat')
@@ -31,6 +31,7 @@ He = H + eye(size(H))*epsilon;
 
 %% SOLVE
 %Solve dual form using quadprog
+if ( 0 )
 n = numel(y) ;
 Y = diag(y) ;
 %K = X'*X; H = Y*K*Y; Andrea Vadaldi form
@@ -57,7 +58,7 @@ svm_opts = statset('MaxIter',200000);
 SVMStruct = svmtrain(X,y,'METHOD','SMO','options',svm_opts,'BOXCONSTRAINT',ub,'AUTOSCALE',false);
 y_train_ref = svmclassify(SVMStruct,X');
 accuracy_train_ref = sum(y_train_ref==y)/length(y)*100;
-
+end
 %% Solve with augmented lagrangian
 ones_N = ones(N, 1);
 lambda0 = 0.5*ones_N*C;
@@ -104,7 +105,7 @@ for k = 1:MaxIterAug,
     elseif( strcmp(Flag, 'projNewton') )
         [alpha, CostTot(k)] = ProjectedNewton(Htild, b, lb, ub, alpha, maxIter, tol, tolkkt);
     else
-        [alpha1, CC] = quadprog(Htild, b, ...
+        [alpha,  CostTot(k)] = quadprog(Htild, b, ...
                          [], [], ...
                          [], [], ...%equality cond
                          lb, ub, ...%box constraints
@@ -120,10 +121,10 @@ for k = 1:MaxIterAug,
     disp('Augmented Lagragian iteration')
     disp(k)
     disp('Distance from ref:')
-    norm(alpha - lambda)
+%     norm(alpha - lambda)
     alphaOld = alpha;
 end
-norm(alpha - lambda)
+% norm(alpha - lambda)
 
 %train results from augmeted lagrangian
 [ w_al, w0_al ] = GetW( X, y, alpha, tolkkt, C );

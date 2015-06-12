@@ -21,7 +21,6 @@ x = x0;
 for k = 1:maxIter,
     d = -gradf(x);
     if (norm(x-xOld)<tol*norm(xOld))
-        disp(['GradientProjection Converged at iteration ' num2str(k)]);
         break;
     end
     %a_k = arg min(f + a*d)
@@ -30,4 +29,5 @@ for k = 1:maxIter,
     xOld = x;
     x = Proj_B(x + alpha_k*d, lb, ub);
 end
+disp(['GradientProjection Converged at iteration ' num2str(k)]);
 CostFinal = f(x);
