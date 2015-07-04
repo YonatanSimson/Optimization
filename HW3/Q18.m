@@ -3,6 +3,7 @@ clear; close all;
 
 load Images.mat
 load LightSources.mat
+load mozart.mat
 
 I = double(Images);
 L = double(LightSources);
@@ -35,7 +36,7 @@ A = R + D;
 b = px + qy; 
 
 x0 = zeros(rows*cols, 1);
-k_max = 3000;
+k_max = 5000;
 tol = 1e-6;
 
 x = x0;
@@ -57,8 +58,17 @@ shading interp
 view(110,45)
 camlight left;
 axis off
+title('Estimated Depth image')
 
 figure;
-colormap gray
-surf(mozart);axis square;
-camlight
+colormap gray;
+surf(mozart,'FaceColor','interp',...
+   'EdgeColor','none',...
+   'FaceLighting','gouraud')
+axis tight
+shading interp
+view(110,45)
+camlight left;
+axis off
+title('Ground Truth')
+
