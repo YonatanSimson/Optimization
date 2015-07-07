@@ -20,20 +20,36 @@ for n = 1:cols,
 end
 
 %find Zx, Zy, N = (-Zx, -Zy, 1)
-Zx = -Image_n(:, :, 1)./(Image_n(:, :, 3) + eps);
-Zy = -Image_n(:, :, 2)./(Image_n(:, :, 3) + eps);
+p = -Image_n(:, :, 1)./(Image_n(:, :, 3));
+q = -Image_n(:, :, 2)./(Image_n(:, :, 3));
 
 
 %% Q19 - Jacobi method
-R = CreateDelOperators(rows, cols);%
-D = -4*spdiags(ones(rows * cols, 1), 0, rows*cols, rows*cols);
-invD = -0.25*spdiags(ones(rows * cols, 1), 0, rows*cols, rows*cols);
+rows_p2 = rows + 2; 
+cols_p2 = cols + 2;
+
+R    = CreateDelOperators(rows, cols);%
+dd   = -full(sum(R, 2));%-full(sum(R, 2));%-4*ones(rows * cols, 1);
+D    = spdiags(dd, 0, rows*cols, rows*cols);
+invD = spdiags(1./dd, 0, rows*cols, rows*cols);
 [Dx, Dy] = CreateDerivativeOperators(rows, cols);
 
-px = Dx*Zx(:);
-qy = Dy*Zy(:);
+px = Dx*p(:);
+qy = Dy*q(:);
+% px = padarray(px, [1 1]);
+% qy = padarray(qy, [1 1]);
+
 A = R + D;
-b = px + qy; 
+b = px + qy;
+
+b = reshape(b, [rows, cols]);
+
+b(:,1) = p(:,1);
+b(:,N) = p(:,N);
+b(1,:) = q(1,:);
+b(N,:) = q(N,:);
+
+b = b(:);
 
 x0 = zeros(rows*cols, 1);
 k_max = 5000;
