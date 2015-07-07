@@ -20,8 +20,8 @@ for n = 1:cols,
 end
 
 %find Zx, Zy, N = (-Zx, -Zy, 1)
-p = -Image_n(:, :, 1)./(Image_n(:, :, 3));
-q = -Image_n(:, :, 2)./(Image_n(:, :, 3));
+p = -Image_n(:, :, 1);%./(Image_n(:, :, 3));
+q = -Image_n(:, :, 2);%./(Image_n(:, :, 3));
 
 
 %% Q19 - Jacobi method
@@ -44,10 +44,14 @@ b = px + qy;
 
 b = reshape(b, [rows, cols]);
 
-b(:,1) = p(:,1);
-b(:,N) = p(:,N);
-b(1,:) = q(1,:);
-b(N,:) = q(N,:);
+% b(:,1) = p(:,1) + q(:, 1);
+% b(:,end) = p(:,end) + q(:, end);
+% b(1,:) = p(1, :) + q(1,:);
+% b(end,:) = p(end,:) + q(end,:);
+b(:,1) = 0;
+b(:,end) = 0;
+b(1,:) = 0;
+b(end,:) = 0;
 
 b = b(:);
 
