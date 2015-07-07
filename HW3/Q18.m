@@ -20,20 +20,22 @@ for n = 1:cols,
 end
 
 %find Zx, Zy, N = (-Zx, -Zy, 1)
-p = -Image_n(:, :, 1);%./(Image_n(:, :, 3));
-q = -Image_n(:, :, 2);%./(Image_n(:, :, 3));
+p = -Image_n(:, :, 1)./(Image_n(:, :, 3));
+q = -Image_n(:, :, 2)./(Image_n(:, :, 3));
 
 
 %% Q19 - Jacobi method
 rows_p2 = rows + 2; 
 cols_p2 = cols + 2;
-
-R    = CreateDelOperators(rows, cols);%
+size = rows_p2*cols_p2;
+R    = CreateDelOperators(rows_p2, cols_p2);%
 dd   = -full(sum(R, 2));%-full(sum(R, 2));%-4*ones(rows * cols, 1);
-D    = spdiags(dd, 0, rows*cols, rows*cols);
-invD = spdiags(1./dd, 0, rows*cols, rows*cols);
-[Dx, Dy] = CreateDerivativeOperators(rows, cols);
+D    = spdiags(dd, 0, size, size);
+invD = spdiags(1./dd, 0, size, size);
+[Dx, Dy] = CreateDerivativeOperators(rows_p2, cols_p2);
 
+p = padarray(p, [1 1]);
+q = padarray(q, [1 1]);
 px = Dx*p(:);
 qy = Dy*q(:);
 % px = padarray(px, [1 1]);
@@ -42,20 +44,7 @@ qy = Dy*q(:);
 A = R + D;
 b = px + qy;
 
-b = reshape(b, [rows, cols]);
-
-% b(:,1) = p(:,1) + q(:, 1);
-% b(:,end) = p(:,end) + q(:, end);
-% b(1,:) = p(1, :) + q(1,:);
-% b(end,:) = p(end,:) + q(end,:);
-b(:,1) = 0;
-b(:,end) = 0;
-b(1,:) = 0;
-b(end,:) = 0;
-
-b = b(:);
-
-x0 = zeros(rows*cols, 1);
+x0 = zeros(size, 1);
 k_max = 5000;
 tol = 1e-6;
 
@@ -66,7 +55,7 @@ while( norm(A*x-b) > tol && k <= k_max )
     k = k + 1;
 end
 
-Z = reshape(x, [rows cols]);
+Z = reshape(x, [rows_p2 cols_p2]);
 
 figure;
 colormap gray;
