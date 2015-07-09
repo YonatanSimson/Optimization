@@ -16,7 +16,7 @@ for n = 1:X_cols,
 
     ii(2*idx-1) = idx;
     jj(2*idx-1) = idx;
-    v(2*idx-1)  = -1;
+    v(2*idx-1)  = 0;
     
     ii(2*idx) = idx;
     jj(2*idx) = idx + 1;
@@ -28,11 +28,11 @@ for n = 1:X_cols,
         
         ii(2*idx-1) = idx;
         jj(2*idx-1) = idx - 1;
-        v(2*idx-1)  = -0.5;
+        v(2*idx-1)  = -1;
 
         ii(2*idx) = idx;
         jj(2*idx) = idx + 1;
-        v(2*idx)  = 0.5;
+        v(2*idx)  = 1;
         
         
         idx = idx + 1;
@@ -44,7 +44,7 @@ for n = 1:X_cols,
     
     ii(2*idx) = idx;
     jj(2*idx) = idx;
-    v(2*idx)  = 1;
+    v(2*idx)  = 0;
     
     idx = idx + 1;
 end
@@ -60,7 +60,7 @@ for m = 1:X_rows,
     
     ii(2*idx-1) = idx;
     jj(2*idx-1) = idx;
-    v(2*idx-1)  = -1;
+    v(2*idx-1)  = 0;
     
     ii(2*idx) = idx;
     jj(2*idx) = idx + X_rows;
@@ -72,11 +72,11 @@ for n = 2:X_cols-1,
     for m = 1:X_rows,
         ii(2*idx-1) = idx;
         jj(2*idx-1) = idx - X_rows;
-        v(2*idx-1)  = -0.5;
+        v(2*idx-1)  = -1;
 
         ii(2*idx) = idx;
         jj(2*idx) = idx + X_rows;
-        v(2*idx)  = 0.5;
+        v(2*idx)  = 1;
         idx = idx + 1;
     end
 end
@@ -85,7 +85,7 @@ for m = 1:X_rows,
 
     ii(2*idx-1) = idx;
     jj(2*idx-1) = idx;
-    v(2*idx-1)  = 1;
+    v(2*idx-1)  = 0;
     
     ii(2*idx) = idx;
     jj(2*idx) = idx - X_rows;

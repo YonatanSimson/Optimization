@@ -20,8 +20,8 @@ for n = 1:cols,
 end
 
 %find Zx, Zy, N = (-Zx, -Zy, 1)
-p = -Image_n(:, :, 1)./(Image_n(:, :, 3));
-q = -Image_n(:, :, 2)./(Image_n(:, :, 3));
+p = -Image_n(:, :, 1)./((Image_n(:, :, 3))  + eps);
+q = -Image_n(:, :, 2)./((Image_n(:, :, 3))  + eps);
 
 
 %% Q19 - Jacobi method
@@ -45,11 +45,12 @@ A = R + D;
 b = px + qy;
 
 x0 = zeros(size, 1);
-k_max = 5000;
-tol = 1e-6;
+k_max = 50000;
+tol = 1e-1;
 
 x = x0;
 k = 1;
+% x = A\b;
 while( norm(A*x-b) > tol && k <= k_max )
     x = invD*(b-R*x);
     k = k + 1;
