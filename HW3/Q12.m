@@ -1,4 +1,5 @@
 %% Brachistochrone problem q.12
+clear;close all;
 n    = 500;
 g    = 9.8;
 [X, Y] = meshgrid(1:n, 1:n);
@@ -10,7 +11,7 @@ n_y = 1./sqrt(2 * g * Y);
 x0 = [1,   1];%xy
 x1 = [300, 300];%xy
 S0 = 0;
-S  = runFSM(nref,x0,S0);
+S  = runFSM(n_y,x0,S0);
 
 close all;
 figure(1);
@@ -21,7 +22,6 @@ hold on; plot(x1(1),x1(2),'sk');
 
 %% Q13
 [Gx, Gy] = gradient(S);
-alpha_k = 0.9;
 
 %iterate
 xOld = inf(length(x0'), 1);
@@ -38,8 +38,6 @@ for k = 1:maxIter,
     if (norm(x-xOld)<tol*norm(xOld) || norm(x-x0') < 1 )
         break;
     end
-    %a_k = arg min(f + a*d)
-    %alpha_k = GoldenSectionLineSearch(@(t)f(x+t*d), 0, alpha_k, maxIter, tol);
     %constant step size
     alpha_k = 0.1 / norm(d);
     %update

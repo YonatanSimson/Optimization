@@ -2,13 +2,8 @@
 close all
 clear all
 
-Data = load('I.mat');
-I    = Data.I ;
-clear Data
-
-Data =  load('mozart.mat');
-mozart = Data.mozart ;
-clear Data
+load('I.mat');
+load('mozart.mat');
 
 eps = 1E-10;
 F       = sqrt(1./I.^2 - 1 );
