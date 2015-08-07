@@ -1,4 +1,4 @@
-function Q5
+function h=Q5
 
 %% define LPF parameters
 L = 500;
@@ -45,7 +45,7 @@ end
         a = x(1:M+1);
 %         h = [0.5*a(M+1:-1:2); a(1); 0.5*a(2:M+1)];
         T2 = aToh(N);
-        h = T2*a;
+        h = 0.5*T2*a;
         
     end
 
