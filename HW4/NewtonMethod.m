@@ -20,7 +20,8 @@ phi = @(x)(-sum(log(b - A * x)));
 f = @(x)(t*c'*x + phi(x));
 grad_phi = @(x)(bsxfun(@rdivide, A', (b - A * x)' + eps));
 grad_f = @(x)(t*c + sum(bsxfun(@rdivide, A', (b - A * x)'), 2));
-hessian_f = @(x)(A' * diag((b - A * x).^2)*A);
+lambda = 1e-6;
+hessian_f = @(x)(A' * diag((b - A * x).^2 + eps)*A);
 
 %iterate
 xOld = inf(length(x0), 1);
@@ -39,7 +40,7 @@ for k = 1:maxIter,
     %d = ConjGrad(H, -gradf_x, -gradf_x, maxIterInner, tolInner); 
 
     % a_k ~ arg min(f + a*d)
-    alpha_k = ArmijoRule(f, x, f(x), grad_f(x), d, sigma, beta, alpha_0);
+    alpha_k = ArmijoRule(f, A, b, x, f(x), grad_f(x), d, sigma, beta, alpha_0);
     %update
     xOld = x;
     x = x + alpha_k*d;

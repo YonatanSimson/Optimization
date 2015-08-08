@@ -12,7 +12,7 @@ end
 t = t0;
 x = x0;
 maxIter = 10000;
-tol = 1e-6;
+tol = 1e-12;
 for k = 1:1000,
     if (m/t < epsilon)
         break;

@@ -1,4 +1,4 @@
-function alpha = ArmijoRule(f, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0)
+function alpha = ArmijoRule(f, A, b, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0)
 %INPUT:
 % f - handle to function f()
 % x_k - x at current iteration
@@ -20,11 +20,12 @@ function alpha = ArmijoRule(f, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_0)
 % f(x_k+alpha*d_k)-f(x_k)<= sigma*alpha*grad(f(x_k))'*d_k
 
 %Init
+m     = size(A, 1); 
 alpha = alpha_0;
-x = x_k + alpha*d_k;
-k = 1;
+x     = x_k + alpha*d_k;
+k     = 1;
 %Iterate
-while (f(x) - f_k > sigma*gradf_k'*(x - x_k))
+while (f(x) - f_k > sigma*gradf_k'*(x - x_k) || sum(A*x-b<0) ~= m )
     alpha = beta*alpha;%shrink alpha
     % straight line
     x = x_k + alpha*d_k;
