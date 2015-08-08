@@ -25,7 +25,7 @@ title('Step responce')
 ylabel('s[n]');
 xlabel('n');
 
-%Time constraints
+%% Q8 - Time constraints
 DeltaT = 0.05;
 
 
