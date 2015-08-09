@@ -48,7 +48,7 @@ for k = 1:maxIter,
     end
     
     % a_k ~ arg min(f + a*d)
-    alpha_k = ArmijoRule(f, x, f(x), gradf(x), d, sigma, beta, alpha_k, lb, ub, flag);
+    alpha_k = ArmijoRule(f, x, f(x), gradf(x), d, sigma, beta, 1, lb, ub, flag);
     %update
     xOld = x;
     x = Proj_B(x + alpha_k*d, lb, ub);
