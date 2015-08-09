@@ -1,8 +1,7 @@
-function [x, Cost] = NewtonMethod(A, b, c, t, x0, maxIter, tol)
+function [x, Cost] = NewtonMethod_v2(f, grad_f, hessian_f, x0, maxIter, tol)
 % Solves the following centering problem via Projected Newton:
 %
-%   minimize     t*c^T*x + phi(x)
-%   subject to   Ax < b
+%   minimize     f(x)
 
 %OUTPUT:
 %   x - Constrained optimal solution
@@ -15,11 +14,6 @@ beta  = 0.5;% For Armijo rule
 %Init
 alpha_0 = 1;
 
-phi = @(x)(-sum(log(b - A * x)));
-f = @(x)(t*c'*x + phi(x));
-grad_phi = @(x)(bsxfun(@rdivide, A', (b - A * x)'));
-grad_f = @(x)(t*c + sum(bsxfun(@rdivide, A', (b - A * x)'), 2));
-hessian_f = @(x)(A' * diag((b - A * x).^2)*A);
 
 %iterate
 xOld = inf(length(x0), 1);
@@ -27,6 +21,7 @@ x = x0;
 dim = length(x0);
 H = ones(dim); %#ok<NASGU>
 d = zeros(dim, 1); %#ok<NASGU>
+Costs = zeros(1, maxIter);
 for k = 1:maxIter,
     if (norm(x-xOld)<tol*norm(xOld))
         break;
@@ -38,19 +33,14 @@ for k = 1:maxIter,
     %d = ConjGrad(H, -gradf_x, -gradf_x, maxIterInner, tolInner); 
 
     % a_k ~ arg min(f + a*d)
-    alpha_k = ArmijoRule(f, A, b, x, f(x), grad_f(x), d, sigma, beta, alpha_0);
+    alpha_k = ArmijoRule_v2(f, x, f(x), grad_f(x), d, sigma, beta, alpha_0);
     %update
     xOld = x;
     x = x + alpha_k*d;
-    
-    m     = size(A, 1); 
-    if ( sum(A*x < b) < m )
-        error('Point returned from newton step is not strictly feasible'); 
-    end
-
     if (mod(k, 1000)==0)
         disp(['Newton Iteration: ' num2str(k)])
     end
+    Costs(k) = f(x);
 end
 disp(['Newton step converged at iteration ' num2str(k)]);
 Cost = f(x);
