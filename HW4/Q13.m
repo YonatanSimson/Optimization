@@ -32,7 +32,7 @@ b = [20; 42; 30; 0; 0; 0;];
 %% Lob Barrier Parameters
 t0 = 500;
 mu = 15;
-epsilon = 1e-12;
+epsilon = 1e-6;
 %% Phase 1 - Find strictly feasible starting point
 gamma_0 = max(b)+ eps;
 AA = [A -ones(size(A,1), 1);
@@ -43,7 +43,7 @@ cc = [zeros(size(A,2), 1); 1];
 xx_0 = [zeros(size(A,2), 1); gamma_0];
 % tt = AA*xx_0 < bb; - check if point is strictly feasible
 options = optimoptions('linprog', 'Algorithm', 'active-set');
-% xx_feas = linprog(cc, AA, bb, [], [], [], [], xx_0, options);
+xx_feas_ref = linprog(cc, AA, bb, [], [], [], [], xx_0, options);
 
 xx_feas = LogBarrierMethod(AA, bb, cc, t0, xx_0, mu, epsilon);
 AA*xx_feas<bb
@@ -55,6 +55,6 @@ tt = A*x0 < b;
 %% Phase 2
 x0 = xx_feas(1:end-1);
 x = LogBarrierMethod(A, b, c, t0, x0, mu, epsilon);
-
+x_ref = linprog(c, A, b, [], [], [], [], x0, options);
 
 
