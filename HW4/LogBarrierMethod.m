@@ -6,6 +6,7 @@ n = size(A, 2);
 %check to see that the intial point is strictly feasible
 if ( sum(A*x0 < b) < m )
     x = nan(n, 1);
+    error('Initial point is infeasible')
     return; 
 end
 
