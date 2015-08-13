@@ -1,6 +1,6 @@
 %Source: http://en.wikipedia.org/wiki/Conjugate_gradient_method
 %Solution to x = arg min_x{f(x)}
-%f(x) = 0.5*x'*A*x-b'x 
+%f(x) = ||Ax-b||^2
 function [x] = ConjGrad(A,b,x, maxIter, tol)
     r=b-A*x;
     p=r;
