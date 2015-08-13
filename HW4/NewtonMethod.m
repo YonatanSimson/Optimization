@@ -27,7 +27,7 @@ H = ones(dim); %#ok<NASGU>
 d = zeros(dim, 1); %#ok<NASGU>
 Costs = zeros(1, maxIter);
 for k = 1:maxIter,
-    if ( norm(x-xOld)<tol*norm(xOld) || norm(d) < tol )
+    if ( norm(x-xOld)<tol*norm(xOld) )
         Costs = Costs(1:k-1);
         break;
     end
