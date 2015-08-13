@@ -48,7 +48,7 @@ for k = 1:maxIter,
         error('Point returned from newton step is not strictly feasible'); 
     end
 
-    if (mod(k, 100000)==0)
+    if (mod(k, 1000)==0)
         disp(['Newton Iteration: ' num2str(k)])
     end
     Costs(k) = f(x);
