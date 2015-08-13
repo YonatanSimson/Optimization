@@ -19,10 +19,14 @@ function alpha = ArmijoRule(f, A, b, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_
 % Alternatively - when there is no projection:
 % f(x_k+alpha*d_k)-f(x_k)<= sigma*alpha*grad(f(x_k))'*d_k
 
+%Armijo-Goldstein rule
+%https://en.wikipedia.org/wiki/Backtracking_line_search
+
 %Init
 m     = size(A, 1); 
 alpha = alpha_0;
 x     = x_k + alpha*d_k;
+t     = -sigma*d_k'*gradf_k;
 k     = 1;
 %Iterate
 while (f(x) - f_k > sigma*gradf_k'*(x - x_k) || sum(A*x-b<-eps) < m )%if point not strictly feasible keep on shrinking

@@ -20,14 +20,15 @@ xOld = inf(length(x0), 1);
 x = x0;
 dim = length(x0);
 H = ones(dim); %#ok<NASGU>
-d = zeros(dim, 1); %#ok<NASGU>
+d = inf(dim, 1); %#ok<NASGU>
 Costs = zeros(1, maxIter);
 for k = 1:maxIter,
-    if (norm(x-xOld)<tol*norm(xOld))
+    if (norm(x-xOld)<tol*norm(xOld) || norm(d) < tol)
         break;
     end
     gradf_x = grad_f(x);
     H = hessian_f(x);
+
     % Newton step
     d = -H\gradf_x; 
     %d = ConjGrad(H, -gradf_x, -gradf_x, maxIterInner, tolInner); 

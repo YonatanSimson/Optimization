@@ -20,13 +20,13 @@ for k = 1:1000,
     end
 %     f = @(x)(t*c'*x - sum(log(b - A * x)));
 %     grad_f = @(x)(t*c + sum(bsxfun(@rdivide, A', (b - A * x)'), 2));
-%     hessian_f = @(x)(A' * diag((b - A * x).^2)*A);
-%     [x, ~] = NewtonMethod_v2(f, grad_f, hessian_f, x, maxIter, tol);
+%     hessian_f = @(x)(A' * diag(1./((b - A * x).^2))*A);
+%     [x, ~] = NewtonMethod_v2(f, grad_f, hessian_f, x0, maxIter, tol);
     options = optimoptions(@fminunc,'GradObj','on','Hessian','on', ...
         'MaxIter', maxIter, 'tolX', tol, 'MaxFunEvals', maxIter);%, 'DerivativeCheck', 'on');
-    [x, Cost] = fminunc(@myfun, x, options);
-
-    %[x, ~] = NewtonMethod(A, b, c, t, x, maxIter, tol);
+    [x_ref, Cost] = fminunc(@myfun, x, options);
+    [x, ~] = NewtonMethod(A, b, c, t, x, maxIter, tol);
+    disp(['Diff between reference my func: ' num2str(norm(x-x_ref))])
     disp(['LP Cost is now: ' num2str(c'*x)]);
     if ( sum(A*x < b) < m )
         error('Point returned from newton step is not strictly feasible'); 
