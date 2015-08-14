@@ -1,5 +1,5 @@
 close all; clear;
-Flag = 'projNewton'; %projGrad, projNewton, quadprog
+Flag = 'projGrad'; %projGrad, projNewton, quadprog
 
 %% INPUTS
 load('xForTraining.mat')
@@ -31,7 +31,7 @@ He = H + eye(size(H))*epsilon;
 
 %% SOLVE
 %Solve dual form using quadprog
-if ( 0 )
+if ( 1 )
 n = numel(y) ;
 Y = diag(y) ;
 %K = X'*X; H = Y*K*Y; Andrea Vadaldi form
