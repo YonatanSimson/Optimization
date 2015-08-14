@@ -1,4 +1,4 @@
-function Q6(h)
+function Q6and8(h)
 
 %% define LPF parameters
 L = 500;
@@ -16,7 +16,7 @@ d = (w<=wc)';%desired LPF frequency responce
 
 N = length(h);
 
-T1 = fliplr(tril(ones(length(h))));
+T1 = fliplr(tril(ones(N)));
 s = T1*h;
 
 figure;
@@ -30,7 +30,6 @@ DeltaT = 0.05;
 
 
 for N1 = 20:-1:1;
-% T1 = T1(1:N1+1, :);
     T2 = aToh(N);
     T = T1(1:N1+1, :)*T2;
 
@@ -42,7 +41,7 @@ for N1 = 20:-1:1;
 
     s_new = T1*h_new;
 
-    figure;
+    figure(2);
     stem(0:length(h_new)-1, s, 'b');
     hold on;
     stem(0:length(h_new)-1, s_new, 'g');

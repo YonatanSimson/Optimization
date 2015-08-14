@@ -1,4 +1,4 @@
-function [A, b, c, M] = FirstFIRProblem(wp, ws, wc, L, N, DeltaP, DeltaS)
+function [A, b, c] = FirstFIRProblem(wp, ws, wc, L, N, DeltaP, DeltaS)
 
 w = (0:L)*pi/L;
 %weighting matrix

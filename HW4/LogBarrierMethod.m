@@ -1,4 +1,4 @@
-function x = LogBarrierMethod(A, b, c, t0, x0, mu, epsilon)
+function [x, Cost] = LogBarrierMethod(A, b, c, t0, x0, mu, epsilon)
 
 m = size(A, 1);
 
@@ -34,6 +34,7 @@ for k = 1:1000,
     t = t*mu;
 end
 
+Cost = c'*x;
 
 %% Nested function - for fminunc and verification
     function [f_x, g, H] = myfun(x)
