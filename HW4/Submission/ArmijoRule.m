@@ -12,13 +12,6 @@ function alpha = ArmijoRule(f, A, b, x_k, f_k, gradf_k, d_k, sigma, beta, alpha_
 %OUTPUT:
 % alpha_k - alpha_k ~ arg min(f(x_k + alpa*d_k))
 %
-%Armijo rule
-% Source: http://en.wikipedia.org/wiki/Wolfe_conditions
-% f(x_k+alpha*d_k)-f(x_k)<= sigma*grad(f(x_k))'*(x_tild - x_k)
-% where x_tild = x_k+alpha*d_k
-% Alternatively - when there is no projection:
-% f(x_k+alpha*d_k)-f(x_k)<= sigma*alpha*grad(f(x_k))'*d_k
-
 %Armijo-Goldstein rule
 %https://en.wikipedia.org/wiki/Backtracking_line_search
 
