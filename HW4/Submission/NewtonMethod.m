@@ -10,6 +10,9 @@ function [x, Cost] = NewtonMethod(A, b, c, t, x0, maxIter, tol)
 %PARAMS
 sigma        = 0.01;% For Armijo rule
 beta         = 0.5;% For Armijo rule
+maxIterInner = 1000;% For CG - for inverting Hessian. Inner loop
+tolInner     = 1e-6;% For CG - for inverting Hessian. Inner loop
+
 %Init
 alpha_0      = 1;% has to be 1 for Newton method to work
 
@@ -33,7 +36,13 @@ for k = 1:maxIter,
     gradf_x = grad_f(x);
     H = hessian_f(x);
     % Newton step
-    d = -H\gradf_x; 
+
+    
+%     d = -H\gradf_x; 
+    
+    %Truncated Newton is faster and works better when H is singular
+    d = ConjGrad(H, -gradf_x, -gradf_x, maxIterInner, tolInner); 
+
 
     % a_k ~ arg min(f + a*d)
     alpha_k = ArmijoRule(f, A, b, x, f(x), grad_f(x), d, sigma, beta, alpha_0);
