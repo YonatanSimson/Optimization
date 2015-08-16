@@ -29,7 +29,7 @@ while (f(x) - f_k > sigma*gradf_k'*(x - x_k) || sum(A*x-b<-eps) < m )%if point n
     %%TODO check if is still interior point
 
     k = k + 1;
-    if ( k >= 100 )
+    if ( k >= 1000 )
         disp('warning: Armijo rule not converging, k> 100');
     end
 end

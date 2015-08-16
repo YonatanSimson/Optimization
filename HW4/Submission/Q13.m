@@ -17,7 +17,7 @@ w = (0:L)*pi/L;
 %% Lob Barrier Parameters
 t0      = 500;
 mu      = 15;
-epsilon = 1e-6;
+epsilon = 1e-16;
 
 %% First FIR design problem
 [A, b, c] = FirstFIRProblem(wp, ws, wc, L, N, DeltaP, DeltaS);

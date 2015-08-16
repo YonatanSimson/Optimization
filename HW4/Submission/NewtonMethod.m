@@ -10,7 +10,7 @@ function [x, Cost] = NewtonMethod(A, b, c, t, x0, maxIter, tol)
 %PARAMS
 sigma        = 0.01;% For Armijo rule
 beta         = 0.5;% For Armijo rule
-maxIterInner = 1000;% For CG - for inverting Hessian. Inner loop
+maxIterInner = 10000;% For CG - for inverting Hessian. Inner loop
 tolInner     = 1e-6;% For CG - for inverting Hessian. Inner loop
 
 %Init
@@ -21,15 +21,17 @@ grad_f    = @(x)(t*c + sum(bsxfun(@rdivide, A', (b - A * x)'), 2));
 hessian_f = @(x)(A' * diag(1./((b - A * x).^2))*A);
 
 %iterate
-xOld  = inf(length(x0), 1);
-x     = x0;
-dim   = length(x0);
-H     = ones(dim); %#ok<NASGU>
-d     = zeros(dim, 1); %#ok<NASGU>
-Costs = zeros(1, maxIter);
-m     = size(A, 1); 
-
+CostOld = inf;
+xOld    = inf(length(x0), 1);
+x       = x0;
+dim     = length(x0);
+H       = ones(dim); %#ok<NASGU>
+d       = inf(dim, 1); %#ok<NASGU>
+Costs   = zeros(1, maxIter);
+m       = size(A, 1); 
+alpha_k = 1;
 for k = 1:maxIter,
+    Cost = f(x);
     if ( norm(x-xOld)<tol*norm(xOld) )
         break;
     end
@@ -45,7 +47,7 @@ for k = 1:maxIter,
 
 
     % a_k ~ arg min(f + a*d)
-    alpha_k = ArmijoRule(f, A, b, x, f(x), grad_f(x), d, sigma, beta, alpha_0);
+    alpha_k = ArmijoRule(f, A, b, x, Cost, gradf_x, d, sigma, beta, alpha_0);
     
     %update
     xOld = x;
@@ -60,5 +62,4 @@ for k = 1:maxIter,
     end
 end
 disp(['Newton step converged at iteration ' num2str(k)]);
-Cost = f(x);
 
