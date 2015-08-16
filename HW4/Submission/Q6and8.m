@@ -55,6 +55,15 @@ for N1 = 20:-1:1;
     end
 end
 
+figure;
+stem(0:length(h_new)-1, abs(s_new-s), 'b');
+title('Step responce difference |s_2[n]-s_1[n]|')
+ylabel('s[n]');
+xlabel('n');
+
+
+displayResultsComp(h, h_new, 2);
+
 %% Nested Functions
     function [del, h] = EquirippleDesign(S, H_d, T)
         M = (N-1)/2;

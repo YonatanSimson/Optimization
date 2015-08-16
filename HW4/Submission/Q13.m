@@ -54,7 +54,7 @@ xlabel('n');
 
 
 tic
-xx_feas = LogBarrierSolver(A, b, c, t0, mu, epsilon);
+x = LogBarrierSolver(A, b, c, t0, mu, epsilon);
 disp('Time for log Barrier')
 toc
 
